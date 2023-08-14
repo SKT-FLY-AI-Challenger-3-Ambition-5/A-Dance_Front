@@ -1,6 +1,7 @@
 import 'package:a_dance/pages/adot_main.dart';
 import 'package:a_dance/pages/select_song.dart';
 import 'package:flutter/material.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class A_Dance_Main extends StatelessWidget {
   const A_Dance_Main({super.key});
@@ -16,10 +17,10 @@ class A_Dance_Main extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(
-              height: 10,
+              height: 20,
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
@@ -100,34 +101,19 @@ class A_Dance_Main extends StatelessWidget {
                             ),
                             Row(
                               children: [
-                                ClipOval(
-                                  child: Image.asset(
-                                    'images/new_jeans.png',
-                                    height: 40,
-                                  ),
-                                ),
+                                RecentPlayedSong(img: 'images/new_jeans.png'),
                                 SizedBox(
                                   width: 10,
                                 ),
-                                ClipOval(
-                                  child: Image.asset(
-                                    'images/new_jeans.png',
-                                    height: 40,
-                                  ),
-                                ),
+                                RecentPlayedSong(img: 'images/new_jeans.png'),
                                 SizedBox(
                                   width: 10,
                                 ),
-                                ClipOval(
-                                  child: Image.asset(
-                                    'images/new_jeans.png',
-                                    height: 40,
-                                  ),
-                                ),
+                                RecentPlayedSong(img: 'images/new_jeans.png'),
                               ],
                             ),
                             SizedBox(
-                              height: 23,
+                              height: 20,
                             ),
                             ElevatedButton(
                               onPressed: () {
@@ -157,16 +143,16 @@ class A_Dance_Main extends StatelessWidget {
               ),
             ),
             SizedBox(
-              height: 10,
+              height: 20,
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   color: Colors.white,
                 ),
-                height: 250,
+                height: 220,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -181,18 +167,237 @@ class A_Dance_Main extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Icon(Icons.refresh),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Icon(Icons.volume_mute),
+                              Icon(Icons.refresh),
+                            ],
+                          )
                         ],
                       ),
+                      SizedBox(
+                        height: 30,
+                      ),
                       Row(
-                        children: [],
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: YoutubePlayer(
+                                  width: 150,
+                                  controller: YoutubePlayerController(
+                                    initialVideoId: 'D-AlVUXUrew',
+                                    flags: const YoutubePlayerFlags(
+                                      autoPlay: true,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text('이프푸 - 르세라핌'),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: YoutubePlayer(
+                                  width: 150,
+                                  controller: YoutubePlayerController(
+                                    initialVideoId: 'ArmDp-zijuc',
+                                    flags: const YoutubePlayerFlags(),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text('Super Shy - New Jeans')
+                            ],
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
               ),
-            )
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.white,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            '리더보드',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              LeaderBoardCell(img: 'images/char1.png'),
+                              LeaderBoardCell(img: 'images/char3.png'),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              LeaderBoardCell(img: 'images/char3.png'),
+                              LeaderBoardCell(img: 'images/char1.png'),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              LeaderBoardCell(img: 'images/char1.png'),
+                              LeaderBoardCell(img: 'images/char3.png'),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                        ],
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            width: 2,
+                            color: Colors.black12,
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                          color: Colors.white,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('더보기'),
+                            SizedBox(width: 30),
+                            Icon(Icons.arrow_forward),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class RecentPlayedSong extends StatelessWidget {
+  final String img;
+
+  const RecentPlayedSong({
+    super.key,
+    required this.img,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipOval(
+      child: Image.asset(
+        img,
+        height: 40,
+      ),
+    );
+  }
+}
+
+class LeaderBoardCell extends StatelessWidget {
+  final String img;
+
+  const LeaderBoardCell({
+    super.key,
+    required this.img,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Flexible(
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            width: 2,
+            color: Colors.black12,
+          ),
+          borderRadius: BorderRadius.circular(15),
+          color: Colors.white,
+        ),
+        height: 100,
+        width: 170,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Image.asset(
+                    img,
+                    height: 80,
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Column(
+                    children: [
+                      Text('최고 점수'),
+                      Text(
+                        '938',
+                        style: TextStyle(
+                          fontSize: 13,
+                        ),
+                      ),
+                      Text(
+                        '최근 플레이 곡',
+                        style: TextStyle(
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
