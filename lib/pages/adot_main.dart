@@ -83,7 +83,7 @@ class Main1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFB9DCF9),
+      backgroundColor: const Color(0xFF9BD7FA),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -109,7 +109,7 @@ class Main1 extends StatelessWidget {
                     ),
                   ),
                   Image(
-                    image: AssetImage('images/char3.png'),
+                    image: AssetImage('images/adot-char.gif'),
                     height: 170,
                   )
                 ],

@@ -1,3 +1,5 @@
+import 'package:a_dance/pages/adot_main.dart';
+import 'package:a_dance/pages/select_song.dart';
 import 'package:flutter/material.dart';
 
 class A_Dance_Main extends StatelessWidget {
@@ -29,22 +31,41 @@ class A_Dance_Main extends StatelessWidget {
                     SizedBox(
                       width: 50,
                     ),
-                    Column(
-                      children: [
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Image(
-                          image: AssetImage('images/char1.png'),
-                          height: 180,
-                        )
-                      ],
+                    Transform.translate(
+                      offset: Offset(-25, 0),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Image(
+                            image: AssetImage('images/adot-char2.gif'),
+                            height: 180,
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Select_Song()));
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                            ),
+                            child: const Text(
+                              '연습하러가기',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     Row(
                       children: [
-                        SizedBox(
-                          width: 20,
-                        ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -104,11 +125,33 @@ class A_Dance_Main extends StatelessWidget {
                                   ),
                                 ),
                               ],
-                            )
+                            ),
+                            SizedBox(
+                              height: 23,
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Adot_Main()));
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                              ),
+                              child: const Text(
+                                '마이 페이지로 이동',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -124,6 +167,29 @@ class A_Dance_Main extends StatelessWidget {
                   color: Colors.white,
                 ),
                 height: 250,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '인기 트렌드',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Icon(Icons.refresh),
+                        ],
+                      ),
+                      Row(
+                        children: [],
+                      ),
+                    ],
+                  ),
+                ),
               ),
             )
           ],
