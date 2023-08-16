@@ -1,4 +1,5 @@
 import 'package:a_dance/pages/a-dance_film.dart';
+import 'package:a_dance/pages/a-dance_main.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube/youtube_thumbnail.dart';
 
@@ -25,6 +26,17 @@ class _Select_SongState extends State<Select_Song> {
             style: TextStyle(
               fontSize: 20,
             ),
+          ),
+          automaticallyImplyLeading: true,
+          leading: BackButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => A_Dance_Main(),
+                ),
+              );
+            },
           ),
         ),
         body: SingleChildScrollView(
