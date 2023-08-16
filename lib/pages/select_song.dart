@@ -1,3 +1,4 @@
+import 'package:a_dance/pages/a-dance_film.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube/youtube_thumbnail.dart';
 
@@ -26,29 +27,42 @@ class _Select_SongState extends State<Select_Song> {
         ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(24.0),
+            padding: EdgeInsets.all(16.0),
             child: Column(
               children: [
                 SizedBox(
-                  height: 16,
+                  height: 8,
                 ),
-                TextField(
-                  controller: myController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: '유튜브 주소 입력',
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      inputText = myController.text.replaceRange(0, 32, '');
-                    });
-                  },
-                  child: Text('update'),
+                Row(
+                  children: [
+                    Flexible(
+                      child: TextField(
+                        controller: myController,
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.all(8),
+                          border: OutlineInputBorder(),
+                          labelText: '유튜브 주소 입력',
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 4,
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          inputText = myController.text.length <= 32
+                              ? inputText
+                              : myController.text.replaceRange(0, 32, '');
+                        });
+                      },
+                      icon: Icon(Icons.search),
+                    )
+                  ],
                 ),
                 SizedBox(
-                  height: 24,
+                  height: 8,
                 ),
                 Text(
                   "선택된 영상",
@@ -158,6 +172,26 @@ class _Select_SongState extends State<Select_Song> {
                     ),
                   ),
                 ),
+                SizedBox(
+                  height: 12,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => A_Dance_Film()));
+                  },
+                  child: Text(
+                    '촬영하러 가기',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF3F3FFF),
+                      minimumSize: Size(280, 40)),
+                )
               ],
             ),
           ),
