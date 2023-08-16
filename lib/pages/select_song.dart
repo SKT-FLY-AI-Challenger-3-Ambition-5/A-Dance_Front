@@ -70,7 +70,7 @@ class _Select_SongState extends State<Select_Song> {
                   "선택된 영상",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 28,
+                    fontSize: 20,
                   ),
                 ),
                 ClipRect(
@@ -85,13 +85,13 @@ class _Select_SongState extends State<Select_Song> {
                 ),
                 Container(
                   width: 480,
-                  height: 220,
+                  height: 208,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
                     color: Colors.white,
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(32.0),
+                    padding: const EdgeInsets.all(24.0),
                     child: Column(
                       children: [
                         Row(
@@ -110,14 +110,14 @@ class _Select_SongState extends State<Select_Song> {
                                     Text(
                                       artist,
                                       style: TextStyle(
-                                        fontSize: 24,
+                                        fontSize: 16,
                                         color: Color(0xFF696969),
                                       ),
                                     ),
                                     Text(
                                       " 의",
                                       style: TextStyle(
-                                        fontSize: 24,
+                                        fontSize: 16,
                                       ),
                                     ),
                                   ],
@@ -125,7 +125,7 @@ class _Select_SongState extends State<Select_Song> {
                                 Text(
                                   title,
                                   style: TextStyle(
-                                    fontSize: 24,
+                                    fontSize: 16,
                                   ),
                                 ),
                               ],
@@ -140,11 +140,13 @@ class _Select_SongState extends State<Select_Song> {
                             Icon(
                               Icons.check_rounded,
                             ),
-                            Text(
-                              "원하는 노래의 유튜브 주소를 입력해주세요",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.black,
+                            Expanded(
+                              child: Text(
+                                "원하는 노래의 유튜브 주소를 입력해주세요",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
                           ],
