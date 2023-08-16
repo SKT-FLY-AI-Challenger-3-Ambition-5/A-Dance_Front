@@ -10,6 +10,8 @@ class Select_Song extends StatefulWidget {
 class _Select_SongState extends State<Select_Song> {
   TextEditingController myController = TextEditingController();
   String inputText = '7HDeem-JaSY';
+  String artist = "아티스트";
+  String title = "제목";
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +85,7 @@ class _Select_SongState extends State<Select_Song> {
                 ),
                 Container(
                   width: 480,
-                  height: 240,
+                  height: 220,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
                     color: Colors.white,
@@ -106,7 +108,7 @@ class _Select_SongState extends State<Select_Song> {
                                 Row(
                                   children: [
                                     Text(
-                                      "아티스트",
+                                      artist,
                                       style: TextStyle(
                                         fontSize: 24,
                                         color: Color(0xFF696969),
@@ -121,7 +123,7 @@ class _Select_SongState extends State<Select_Song> {
                                   ],
                                 ),
                                 Text(
-                                  "노래 제목",
+                                  title,
                                   style: TextStyle(
                                     fontSize: 24,
                                   ),
@@ -138,19 +140,17 @@ class _Select_SongState extends State<Select_Song> {
                             Icon(
                               Icons.check_rounded,
                             ),
-                            Expanded(
-                              child: Text(
-                                "원하는 노래의 유튜브 주소를 입력해주세요",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                ),
+                            Text(
+                              "원하는 노래의 유튜브 주소를 입력해주세요",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
                               ),
                             ),
                           ],
                         ),
                         SizedBox(
-                          height: 8,
+                          height: 16,
                         ),
                         Row(
                           children: [
