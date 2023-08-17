@@ -1,3 +1,4 @@
+import 'package:a_dance/pages/a-dance_film.dart';
 import 'package:a_dance/pages/a-dance_mypage.dart';
 import 'package:a_dance/pages/select_song.dart';
 import 'package:flutter/material.dart';
@@ -194,7 +195,8 @@ class A_Dance_Main extends StatelessWidget {
                                   controller: YoutubePlayerController(
                                     initialVideoId: 'D-AlVUXUrew',
                                     flags: const YoutubePlayerFlags(
-                                      autoPlay: true,
+                                      // autoPlay: true,
+                                      mute: true,
                                     ),
                                   ),
                                 ),
@@ -213,7 +215,10 @@ class A_Dance_Main extends StatelessWidget {
                                   width: 150,
                                   controller: YoutubePlayerController(
                                     initialVideoId: 'ArmDp-zijuc',
-                                    flags: const YoutubePlayerFlags(),
+                                    flags: const YoutubePlayerFlags(
+                                      // autoPlay: true,
+                                      mute: true,
+                                    ),
                                   ),
                                 ),
                               ),
