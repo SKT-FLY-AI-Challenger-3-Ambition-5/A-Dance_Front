@@ -1,4 +1,4 @@
-import 'package:a_dance/pages/adot_main.dart';
+import 'package:a_dance/pages/a-dance_mypage.dart';
 import 'package:a_dance/pages/select_song.dart';
 import 'package:flutter/material.dart';
 
@@ -132,9 +132,11 @@ class A_Dance_Main extends StatelessWidget {
                             ElevatedButton(
                               onPressed: () {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => Adot_Main()));
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MyPage(),
+                                  ),
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue,
