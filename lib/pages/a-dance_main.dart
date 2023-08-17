@@ -1,5 +1,5 @@
-import 'package:a_dance/pages/a-dance_film.dart';
 import 'package:a_dance/pages/a-dance_mypage.dart';
+import 'package:a_dance/pages/adot_main.dart';
 import 'package:a_dance/pages/select_song.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
@@ -13,6 +13,16 @@ class A_Dance_Main extends StatelessWidget {
       backgroundColor: Color(0xFFE5E4EE),
       appBar: AppBar(
         title: Text('에이단ㅡ스'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => Adot_Main()),
+                (route) => false);
+          },
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -195,8 +205,9 @@ class A_Dance_Main extends StatelessWidget {
                                   controller: YoutubePlayerController(
                                     initialVideoId: 'D-AlVUXUrew',
                                     flags: const YoutubePlayerFlags(
-                                      // autoPlay: true,
+                                      autoPlay: true,
                                       mute: true,
+                                      hideControls: true,
                                     ),
                                   ),
                                 ),
@@ -216,8 +227,9 @@ class A_Dance_Main extends StatelessWidget {
                                   controller: YoutubePlayerController(
                                     initialVideoId: 'ArmDp-zijuc',
                                     flags: const YoutubePlayerFlags(
-                                      // autoPlay: true,
+                                      autoPlay: false,
                                       mute: true,
+                                      hideControls: true,
                                     ),
                                   ),
                                 ),

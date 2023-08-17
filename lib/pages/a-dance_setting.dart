@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:a_dance/pages/a-dance_mypage.dart';
+import 'package:flutter/material.dart';
 
 class Setting extends StatelessWidget {
   @override
@@ -12,11 +12,8 @@ class Setting extends StatelessWidget {
           title: Text('설정'),
           leading: BackButton(
             onPressed: () {
-              Navigator.push(
+              Navigator.pop(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => MyPage(),
-                ),
               );
             },
           ),
@@ -25,7 +22,6 @@ class Setting extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Container(
-              height: 540,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,7 +45,6 @@ class Setting extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    width: 340,
                     height: 160,
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
@@ -87,6 +82,9 @@ class Setting extends StatelessWidget {
                       ),
                     ),
                   ),
+                  SizedBox(
+                    height: 20,
+                  ),
                   Row(
                     children: [
                       SizedBox(
@@ -106,7 +104,6 @@ class Setting extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    width: 340,
                     height: 120,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -161,6 +158,9 @@ class Setting extends StatelessWidget {
                       ),
                     ),
                   ),
+                  SizedBox(
+                    height: 20,
+                  ),
                   Row(
                     children: [
                       SizedBox(
@@ -180,7 +180,6 @@ class Setting extends StatelessWidget {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    width: 340,
                     height: 120,
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
@@ -252,22 +251,6 @@ class Setting extends StatelessWidget {
               ),
             ),
           ),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          items: <BottomNavigationBarItem>[
-            const BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
-            const BottomNavigationBarItem(
-                icon: Icon(Icons.chat_rounded), label: '챗T'),
-            BottomNavigationBarItem(
-                icon: Image.asset(
-                  'images/a_dot_bottom_bar.png',
-                  height: 50,
-                ),
-                label: ''),
-            const BottomNavigationBarItem(icon: Icon(Icons.face), label: '프렌즈'),
-            const BottomNavigationBarItem(icon: Icon(Icons.menu), label: '메뉴'),
-          ],
         ),
       ),
     );

@@ -1,7 +1,6 @@
 import 'package:a_dance/pages/a-dance_film.dart';
 import 'package:a_dance/pages/a-dance_main.dart';
 import 'package:flutter/material.dart';
-import 'package:youtube/youtube_thumbnail.dart';
 
 class Select_Song extends StatefulWidget {
   @override
@@ -66,9 +65,13 @@ class _Select_SongState extends State<Select_Song> {
                     IconButton(
                       onPressed: () {
                         setState(() {
-                          inputText = myController.text.length <= 32
-                              ? inputText
-                              : myController.text.replaceRange(0, 32, '');
+                          RegExp regExp = RegExp(
+                              r'(?:youtube\.com/watch\?v=|youtu\.be/)([^&]+)');
+                          Match? match = regExp.firstMatch(myController.text);
+
+                          if (match != null) {
+                            inputText = match.group(1) ?? '';
+                          }
                         });
                       },
                       icon: Icon(Icons.search),
@@ -87,10 +90,7 @@ class _Select_SongState extends State<Select_Song> {
                 ),
                 ClipRect(
                   child: Image.network(
-                    YoutubeThumbnail(
-                      youtubeId: inputText,
-                    ).mq(),
-                  ),
+                      'https://img.youtube.com/vi/$inputText/mqdefault.jpg'),
                 ),
                 SizedBox(
                   height: 12,
@@ -209,22 +209,6 @@ class _Select_SongState extends State<Select_Song> {
               ],
             ),
           ),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          items: [
-            const BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
-            const BottomNavigationBarItem(
-                icon: Icon(Icons.chat_rounded), label: '챗T'),
-            BottomNavigationBarItem(
-                icon: Image.asset(
-                  'images/a_dot_bottom_bar.png',
-                  height: 50,
-                ),
-                label: ''),
-            const BottomNavigationBarItem(icon: Icon(Icons.face), label: '프렌즈'),
-            const BottomNavigationBarItem(icon: Icon(Icons.menu), label: '메뉴'),
-          ],
         ),
       ),
     );

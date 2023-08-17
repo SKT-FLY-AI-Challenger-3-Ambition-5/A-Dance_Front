@@ -1,11 +1,14 @@
 import 'package:a_dance/pages/a-dance_main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class Adot_Main extends StatelessWidget {
   const Adot_Main({super.key});
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+
     return MaterialApp(
       title: 'Bottom Navigation Bar',
       theme: ThemeData(

@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:a_dance/pages/a-dance_main.dart';
 import 'package:a_dance/pages/a-dance_setting.dart';
+import 'package:flutter/material.dart';
 
 class MyPage extends StatelessWidget {
   @override
@@ -13,12 +12,7 @@ class MyPage extends StatelessWidget {
           title: Text('마이페이지'),
           leading: BackButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => A_Dance_Main(),
-                ),
-              );
+              Navigator.pop(context);
             },
           ),
           actions: <Widget>[
@@ -39,8 +33,6 @@ class MyPage extends StatelessWidget {
         body: SingleChildScrollView(
           padding: EdgeInsets.all(8.0),
           child: Container(
-            width: 360,
-            height: 568,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               color: Colors.white,
@@ -48,11 +40,11 @@ class MyPage extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(
-                  height: 12,
+                  height: 40,
                 ),
                 Container(
                   padding: EdgeInsets.all(16.0),
-                  width: 320,
+                  width: 360,
                   height: 140,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
@@ -198,13 +190,13 @@ class MyPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(
-                  height: 12,
+                  height: 30,
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: 12,
                   ),
-                  width: 320,
+                  width: 360,
                   height: 40,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
@@ -222,6 +214,9 @@ class MyPage extends StatelessWidget {
                     ],
                   ),
                 ),
+                SizedBox(
+                  height: 20,
+                ),
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
@@ -230,8 +225,8 @@ class MyPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
-                            width: 140,
-                            height: 152,
+                            width: 170,
+                            height: 180,
                             decoration: BoxDecoration(
                               color: Color(0xFF6F6FFA),
                               borderRadius: BorderRadius.circular(10),
@@ -268,8 +263,8 @@ class MyPage extends StatelessWidget {
                             ),
                           ),
                           Container(
-                            width: 140,
-                            height: 152,
+                            width: 170,
+                            height: 180,
                             decoration: BoxDecoration(
                               color: Color(0xFF3F3FFF),
                               borderRadius: BorderRadius.circular(10),
@@ -308,14 +303,14 @@ class MyPage extends StatelessWidget {
                         ],
                       ),
                       SizedBox(
-                        height: 20,
+                        height: 30,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
-                            width: 140,
-                            height: 152,
+                            width: 170,
+                            height: 180,
                             decoration: BoxDecoration(
                               color: Color(0xFF5252FF),
                               borderRadius: BorderRadius.circular(10),
@@ -352,8 +347,8 @@ class MyPage extends StatelessWidget {
                             ),
                           ),
                           Container(
-                            width: 140,
-                            height: 152,
+                            width: 170,
+                            height: 180,
                             decoration: BoxDecoration(
                               color: Color(0xFF343783),
                               borderRadius: BorderRadius.circular(10),
@@ -391,28 +386,15 @@ class MyPage extends StatelessWidget {
                           ),
                         ],
                       ),
+                      SizedBox(
+                        height: 30,
+                      ),
                     ],
                   ),
                 )
               ],
             ),
           ),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          items: <BottomNavigationBarItem>[
-            const BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
-            const BottomNavigationBarItem(
-                icon: Icon(Icons.chat_rounded), label: '챗T'),
-            BottomNavigationBarItem(
-                icon: Image.asset(
-                  'images/a_dot_bottom_bar.png',
-                  height: 50,
-                ),
-                label: ''),
-            const BottomNavigationBarItem(icon: Icon(Icons.face), label: '프렌즈'),
-            const BottomNavigationBarItem(icon: Icon(Icons.menu), label: '메뉴'),
-          ],
         ),
       ),
     );
