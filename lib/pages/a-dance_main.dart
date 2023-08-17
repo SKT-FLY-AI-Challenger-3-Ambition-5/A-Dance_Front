@@ -1,4 +1,5 @@
 import 'package:a_dance/pages/a-dance_film.dart';
+import 'package:a_dance/pages/a-dance_mypage.dart';
 import 'package:a_dance/pages/select_song.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
@@ -118,9 +119,11 @@ class A_Dance_Main extends StatelessWidget {
                             ElevatedButton(
                               onPressed: () {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => A_Dance_Film()));
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MyPage(),
+                                  ),
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue,
