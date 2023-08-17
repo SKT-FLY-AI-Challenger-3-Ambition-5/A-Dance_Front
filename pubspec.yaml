@@ -73,6 +73,12 @@ flutter:
      - images/new_jeans.png
      - images/adot-char.gif
      - images/adot-char2.gif
+     - assets/rabbit.png
+     - assets/back_icon.png
+     - assets/boy.png
+     - assets/girl.png
+     - assets/boy2.png
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
