@@ -109,27 +109,53 @@ class Setting extends StatelessWidget {
                     width: 340,
                     height: 120,
                     child: Padding(
-                      padding: const EdgeInsets.all(20.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("노래 인기 순위"),
-                              Icon(
-                                Icons.chevron_right_rounded,
-                              ),
-                            ],
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.black,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MyPage(),
+                                ),
+                              );
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("노래 인기 순위"),
+                                Icon(
+                                  Icons.chevron_right_rounded,
+                                ),
+                              ],
+                            ),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("곡별 리더보드"),
-                              Icon(
-                                Icons.chevron_right_rounded,
-                              ),
-                            ],
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.black,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MyPage(),
+                                ),
+                              );
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("곡별 리더보드"),
+                                Icon(
+                                  Icons.chevron_right_rounded,
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
