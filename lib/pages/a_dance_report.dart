@@ -1,10 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-
-void main() {
-  runApp(ReportApp());
-}
+import 'package:a_dance/pages/adot_main.dart';
 
 class ReportApp extends StatelessWidget {
   final List<double> data;
@@ -29,6 +26,7 @@ class ReportApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("BuildContext: $context");
     return MaterialApp(
       home: Scaffold(
         backgroundColor: Color(0xFFE5E4EE), // 회색 배경
@@ -64,7 +62,17 @@ class ReportApp extends StatelessWidget {
                         SizedBox(
                           width: 1,
                         ),
-                        Icon(Icons.arrow_back_ios_new_rounded),
+                        IconButton(
+                          icon: Icon(Icons.arrow_back_ios_new_rounded),
+                          onPressed: () {
+                            // Navigator.pushAndRemoveUntil(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //         builder: (BuildContext context) =>
+                            //             Adot_Main()),
+                            //     (route) => false);
+                          },
+                        ),
                         SizedBox(
                           width: 70,
                         ),
@@ -79,7 +87,34 @@ class ReportApp extends StatelessWidget {
                         SizedBox(
                           width: 70,
                         ),
-                        Icon(Icons.more_vert_rounded),
+                        IconButton(
+                          icon: Icon(Icons.more_vert_rounded),
+                          onPressed: () {
+                            // showDialog(
+                            //   context: context,
+                            //   builder: (BuildContext context) {
+                            //     return AlertDialog(
+                            //       title: Text('더보기'),
+                            //       content: Text('팝업 창 내용'),
+                            //       actions: [
+                            //         ElevatedButton(
+                            //           onPressed: () {
+                            //             Navigator.pushAndRemoveUntil(
+                            //                 context,
+                            //                 MaterialPageRoute(
+                            //                     builder:
+                            //                         (BuildContext context) =>
+                            //                             Adot_Main()),
+                            //                 (route) => false);
+                            //           },
+                            //           child: Text('닫기'),
+                            //         ),
+                            //       ],
+                            //     );
+                            //   },
+                            // );
+                          },
+                        ),
                         SizedBox(width: 1),
                       ],
                     ),
@@ -93,7 +128,7 @@ class ReportApp extends StatelessWidget {
                               color: Color(0xFF9EA3B1),
                               fontSize: 28,
                               fontFamily: 'Inter',
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w700,
                               height: 1.50,
                             ),
                           ),
@@ -103,7 +138,7 @@ class ReportApp extends StatelessWidget {
                               color: Colors.black,
                               fontSize: 28,
                               fontFamily: 'Inter',
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w700,
                               height: 1.50,
                             ),
                           ),
@@ -113,7 +148,7 @@ class ReportApp extends StatelessWidget {
                               color: Color(0xFF5252FF),
                               fontSize: 28,
                               fontFamily: 'Inter',
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w700,
                               height: 1.50,
                             ),
                           ),
@@ -123,7 +158,7 @@ class ReportApp extends StatelessWidget {
                               color: Colors.black,
                               fontSize: 28,
                               fontFamily: 'Inter',
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w700,
                               height: 1.50,
                             ),
                           ),
@@ -202,9 +237,18 @@ class ReportApp extends StatelessWidget {
                                           index.toDouble(), data[index]);
                                     }),
                                     isCurved: true,
-                                    color: Color(0xFF6F6FFA),
+                                    color: Color.fromARGB(255, 121, 121, 250),
                                     dotData: FlDotData(show: false),
                                     belowBarData: BarAreaData(show: false),
+                                    barWidth: 7,
+                                    //preventCurveOverShooting: true,
+                                    // isStrokeJoinRound: true,
+                                    isStrokeCapRound: true,
+                                    shadow: Shadow(
+                                      color: Color.fromARGB(255, 177, 177, 177),
+                                      offset: Offset(0, 2),
+                                      blurRadius: 5.0,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -217,7 +261,7 @@ class ReportApp extends StatelessWidget {
                       height: 30,
                     ),
                     Container(
-                      height: 120,
+                      height: 125,
                       padding: const EdgeInsets.only(top: 11, bottom: 2),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -227,7 +271,7 @@ class ReportApp extends StatelessWidget {
                           //평균 정확도
                           Container(
                             width: 160,
-                            height: 110,
+                            height: 125,
                             padding: EdgeInsets.symmetric(
                               vertical: 13,
                               horizontal: 20,
@@ -261,7 +305,7 @@ class ReportApp extends StatelessWidget {
                                       color: Color(0xFFA0AEC0),
                                       fontSize: 12,
                                       fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w800,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ],
@@ -276,14 +320,14 @@ class ReportApp extends StatelessWidget {
                                   ),
                                   SizedBox(
                                     width: 50,
-                                    height: 25,
+                                    height: 30,
                                     child: Text(
                                       '72%',
                                       style: TextStyle(
                                         color: Color(0xFF2D3748),
                                         fontSize: 23,
                                         fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.w800,
                                       ),
                                     ),
                                   ),
@@ -344,7 +388,7 @@ class ReportApp extends StatelessWidget {
                           ),
                           Container(
                             width: 160,
-                            height: 110,
+                            height: 125,
                             padding: EdgeInsets.symmetric(
                               vertical: 13,
                               horizontal: 20,
@@ -379,7 +423,7 @@ class ReportApp extends StatelessWidget {
                                         color: Color(0xFFA0AEC0),
                                         fontSize: 12,
                                         fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w800,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ],
@@ -394,14 +438,14 @@ class ReportApp extends StatelessWidget {
                                     ),
                                     SizedBox(
                                       width: 50,
-                                      height: 25,
+                                      height: 30,
                                       child: Text(
                                         '86%',
                                         style: TextStyle(
                                           color: Color(0xFF2D3748),
                                           fontSize: 23,
                                           fontFamily: 'Inter',
-                                          fontWeight: FontWeight.w900,
+                                          fontWeight: FontWeight.w800,
                                         ),
                                       ),
                                     ),
@@ -497,7 +541,7 @@ class ReportApp extends StatelessWidget {
                               Text(
                                 "정확도가 낮은 부분을",
                                 style: TextStyle(
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                   fontSize: 24,
                                   color: Colors.white,
                                 ),
@@ -512,7 +556,7 @@ class ReportApp extends StatelessWidget {
                               Text(
                                 "조금만 더 연습해보세요!",
                                 style: TextStyle(
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                   fontSize: 24,
                                   color: Colors.white,
                                 ),
@@ -563,10 +607,10 @@ class ReportApp extends StatelessWidget {
                                                 .hand_point_right_fill,
                                             color: Colors.amber),
                                         Text(
-                                          " 0:03~0:06 ",
+                                          " 0:03~0:06",
                                           style: TextStyle(
                                               fontFamily: 'Inter',
-                                              fontWeight: FontWeight.w900,
+                                              fontWeight: FontWeight.w700,
                                               fontSize: 24,
                                               color: Colors.black),
                                         ),
@@ -594,7 +638,11 @@ class ReportApp extends StatelessWidget {
                             ),
                             child: Row(
                               children: [
-                                Image.asset("images/example.png", width: 100),
+                                Image.asset(
+                                  "images/example.png",
+                                  width: 100,
+                                  height: 190,
+                                ),
                                 SizedBox(width: 30),
                                 SizedBox(
                                   width: 150,
@@ -605,7 +653,7 @@ class ReportApp extends StatelessWidget {
                                       color: Colors.black,
                                       fontSize: 20,
                                       fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w900,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                 ),
@@ -657,10 +705,10 @@ class ReportApp extends StatelessWidget {
                                                 .hand_point_right_fill,
                                             color: Colors.amber),
                                         Text(
-                                          " 0:12~0:15 ",
+                                          " 0:12~0:15",
                                           style: TextStyle(
                                               fontFamily: 'Inter',
-                                              fontWeight: FontWeight.w900,
+                                              fontWeight: FontWeight.w700,
                                               fontSize: 24,
                                               color: Colors.black),
                                         ),
@@ -688,7 +736,11 @@ class ReportApp extends StatelessWidget {
                             ),
                             child: Row(
                               children: [
-                                Image.asset("images/example.png", width: 100),
+                                Image.asset(
+                                  "images/example.png",
+                                  width: 100,
+                                  height: 190,
+                                ),
                                 SizedBox(width: 30),
                                 SizedBox(
                                   width: 150,
@@ -699,7 +751,7 @@ class ReportApp extends StatelessWidget {
                                       color: Colors.black,
                                       fontSize: 20,
                                       fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w900,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                 ),
@@ -751,10 +803,10 @@ class ReportApp extends StatelessWidget {
                                                 .hand_point_right_fill,
                                             color: Colors.amber),
                                         Text(
-                                          " 0:12~0:15 ",
+                                          " 0:12~0:15",
                                           style: TextStyle(
                                               fontFamily: 'Inter',
-                                              fontWeight: FontWeight.w900,
+                                              fontWeight: FontWeight.w700,
                                               fontSize: 24,
                                               color: Colors.black),
                                         ),
@@ -782,7 +834,11 @@ class ReportApp extends StatelessWidget {
                             ),
                             child: Row(
                               children: [
-                                Image.asset("images/example.png", width: 100),
+                                Image.asset(
+                                  "images/example.png",
+                                  width: 100,
+                                  height: 190,
+                                ),
                                 SizedBox(width: 30),
                                 SizedBox(
                                   width: 150,
@@ -793,7 +849,7 @@ class ReportApp extends StatelessWidget {
                                       color: Colors.black,
                                       fontSize: 20,
                                       fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w900,
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                 ),
