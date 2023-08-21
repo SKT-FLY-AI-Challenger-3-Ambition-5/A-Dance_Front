@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  fl_chart: ^0.62.0
+  
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -60,19 +62,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-     - images/a_dot_bottom_bar.png
-     - images/adot_logo.png
-     - images/char1.png
-     - images/char3.png
-     - images/main_card1.png
-     - images/main_card2.png
-     - images/main2.png
-     - images/main3.png
-     - images/main4.png
-     - images/main5.png
-     - images/new_jeans.png
-     - images/adot-char.gif
-     - images/adot-char2.gif
+     - images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
