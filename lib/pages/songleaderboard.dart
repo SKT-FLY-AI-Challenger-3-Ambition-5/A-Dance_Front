@@ -32,6 +32,22 @@ class LeaderboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        items: <BottomNavigationBarItem>[
+          const BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.chat_rounded), label: '챗T'),
+          BottomNavigationBarItem(
+              icon: Image.asset(
+                'images/a_dot_bottom_bar.png',
+                height: 50,
+              ),
+              label: ''),
+          const BottomNavigationBarItem(icon: Icon(Icons.face), label: '프렌즈'),
+          const BottomNavigationBarItem(icon: Icon(Icons.menu), label: '메뉴'),
+        ],
+      ),
       appBar: AppBar(
         title: Text('Hype Boy - New Jeans'),
         centerTitle: true,
