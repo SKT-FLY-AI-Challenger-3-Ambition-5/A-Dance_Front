@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  fl_chart: ^0.62.0
   youtube_player_flutter:
   camera:
   tflite_flutter:
