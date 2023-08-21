@@ -12,9 +12,19 @@ class A_Dance_Main extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xFFE5E4EE),
       appBar: AppBar(
-        title: Text('에이단ㅡ스'),
+        backgroundColor: Colors.white,
+        title: Text(
+          '에이단ㅡ스',
+          style: TextStyle(
+            fontSize: 18,
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
+        centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () {
             Navigator.pushAndRemoveUntil(
                 context,
@@ -23,6 +33,7 @@ class A_Dance_Main extends StatelessWidget {
                 (route) => false);
           },
         ),
+        toolbarHeight: 60.0,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -37,7 +48,7 @@ class A_Dance_Main extends StatelessWidget {
                   borderRadius: BorderRadius.circular(15),
                   color: Colors.white,
                 ),
-                height: 250,
+                height: 270,
                 child: Row(
                   children: [
                     SizedBox(
@@ -54,6 +65,7 @@ class A_Dance_Main extends StatelessWidget {
                             image: AssetImage('images/adot-char2.gif'),
                             height: 180,
                           ),
+                          SizedBox(height: 10),
                           ElevatedButton(
                             onPressed: () {
                               Navigator.push(
@@ -62,12 +74,13 @@ class A_Dance_Main extends StatelessWidget {
                                       builder: (context) => Select_Song()));
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
+                              backgroundColor: Color(0xFF3F3FFF),
                             ),
                             child: const Text(
                               '연습하러가기',
                               style: TextStyle(
-                                fontSize: 10,
+                                fontSize: 15,
+                                fontFamily: 'Inter',
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
@@ -88,6 +101,7 @@ class A_Dance_Main extends StatelessWidget {
                               '내 최고 점수',
                               style: TextStyle(
                                 fontSize: 18,
+                                fontFamily: 'Inter',
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -95,6 +109,7 @@ class A_Dance_Main extends StatelessWidget {
                               '999',
                               style: TextStyle(
                                 fontSize: 18,
+                                fontFamily: 'Inter',
                               ),
                             ),
                             SizedBox(
@@ -104,6 +119,7 @@ class A_Dance_Main extends StatelessWidget {
                               '최근 플레이 곡',
                               style: TextStyle(
                                 fontSize: 15,
+                                fontFamily: 'Inter',
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -124,7 +140,7 @@ class A_Dance_Main extends StatelessWidget {
                               ],
                             ),
                             SizedBox(
-                              height: 20,
+                              height: 32,
                             ),
                             ElevatedButton(
                               onPressed: () {
@@ -136,12 +152,13 @@ class A_Dance_Main extends StatelessWidget {
                                 );
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
+                                backgroundColor: Color(0xFF3F3FFF),
                               ),
                               child: const Text(
                                 '마이 페이지로 이동',
                                 style: TextStyle(
-                                  fontSize: 10,
+                                  fontSize: 15,
+                                  fontFamily: 'Inter',
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
@@ -170,13 +187,17 @@ class A_Dance_Main extends StatelessWidget {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
+                      SizedBox(
+                        height: 5,
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '인기 트렌드',
+                            ' 인기 트렌드',
                             style: TextStyle(
                               fontSize: 20,
+                              fontFamily: 'Inter',
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -184,6 +205,9 @@ class A_Dance_Main extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Icon(Icons.volume_mute),
+                              SizedBox(
+                                width: 10,
+                              ),
                               Icon(Icons.refresh),
                             ],
                           )
@@ -215,7 +239,12 @@ class A_Dance_Main extends StatelessWidget {
                               SizedBox(
                                 height: 10,
                               ),
-                              Text('이프푸 - 르세라핌'),
+                              Text(
+                                '이프푸 - 르세라핌',
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                ),
+                              ),
                             ],
                           ),
                           Column(
@@ -237,7 +266,12 @@ class A_Dance_Main extends StatelessWidget {
                               SizedBox(
                                 height: 10,
                               ),
-                              Text('Super Shy - New Jeans')
+                              Text(
+                                'Super Shy - New Jeans',
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                ),
+                              )
                             ],
                           ),
                         ],
@@ -264,9 +298,10 @@ class A_Dance_Main extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            '리더보드',
+                            ' 리더보드',
                             style: TextStyle(
                               fontSize: 20,
+                              fontFamily: 'Inter',
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -319,11 +354,21 @@ class A_Dance_Main extends StatelessWidget {
                           color: Colors.white,
                         ),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Text('더보기'),
-                            SizedBox(width: 30),
-                            Icon(Icons.arrow_forward),
+                            Text(
+                              '더보기',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontFamily: 'Inter',
+                              ),
+                            ),
+                            SizedBox(
+                              width: 130,
+                              height: 45,
+                            ),
+                            Icon(Icons.arrow_forward_ios_rounded),
+                            SizedBox(width: 5)
                           ],
                         ),
                       )
@@ -398,17 +443,28 @@ class LeaderBoardCell extends StatelessWidget {
                   ),
                   Column(
                     children: [
-                      Text('최고 점수'),
+                      Text(
+                        '최고 점수',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       Text(
                         '938',
                         style: TextStyle(
+                          fontFamily: 'Inter',
                           fontSize: 13,
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
                       Text(
                         '최근 플레이 곡',
                         style: TextStyle(
+                          fontFamily: 'Inter',
                           fontSize: 12,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
