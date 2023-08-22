@@ -1,11 +1,17 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:a_dance/pages/a-dance_video_player.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 class A_Dance_Film extends StatefulWidget {
+  final String videoPath;
+
+  A_Dance_Film({required this.videoPath});
+
   @override
   _A_Dance_Film_State createState() => _A_Dance_Film_State();
 }
@@ -14,23 +20,21 @@ class _A_Dance_Film_State extends State<A_Dance_Film> {
   CameraController? _cameraController;
   Future<void>? _initializeCameraFuture;
   int countdownValue = 3;
-  late AudioPlayer player;
   late AudioPlayer counter;
   bool isRecording = false;
   String? videoPath; // 녹화된 동영상의 경로를 저장합니다.
+  VideoPlayerController? _videoPlayerController;
 
   @override
   void initState() {
     super.initState();
     _initializeCamera();
-    player = AudioPlayer();
     counter = AudioPlayer();
-
-    player.onPlayerComplete.listen((event) {
-      if (isRecording) {
-        stopRecording(); // 노래가 끝나면 녹화를 중지합니다.
-      }
-    });
+    _videoPlayerController = VideoPlayerController.file(File(widget.videoPath))
+      ..initialize().then((_) {
+        setState(() {});
+        _videoPlayerController?.addListener(_videoListener); // 리스너 추가
+      });
   }
 
   _initializeCamera() async {
@@ -53,6 +57,15 @@ class _A_Dance_Film_State extends State<A_Dance_Film> {
     setState(() {});
   }
 
+  void _videoListener() {
+    if (_videoPlayerController?.value.position ==
+        _videoPlayerController?.value.duration) {
+      // 비디오 재생이 끝났을 때의 처리
+      stopRecording();
+      _videoPlayerController?.removeListener(_videoListener); // 리스너 제거
+    }
+  }
+
   Future<void> startCountdown() async {
     Future.delayed(Duration(seconds: 1), () async {
       if (countdownValue > 0) {
@@ -61,9 +74,8 @@ class _A_Dance_Film_State extends State<A_Dance_Film> {
         });
         startCountdown();
       } else {
-        player.play(AssetSource(
-            'songs/hong.mp3')); // Replace 'song.mp3' with your song's filename. // When countdown finishes, play the song.
         await _cameraController?.startVideoRecording();
+        await _videoPlayerController?.play();
       }
     });
   }
@@ -96,7 +108,7 @@ class _A_Dance_Film_State extends State<A_Dance_Film> {
       videoPath = null;
     });
 
-    player.stop();
+    _videoPlayerController?.pause();
   }
 
   @override
@@ -145,6 +157,25 @@ class _A_Dance_Film_State extends State<A_Dance_Film> {
                           color: Colors.white),
                     ),
                   ),
+                if (_videoPlayerController?.value.isInitialized ?? false)
+                  Positioned(
+                    top: 20, // 원하는 위쪽 패딩을 조정하세요
+                    right: 20, // 원하는 오른쪽 패딩을 조정하세요
+                    child: Opacity(
+                      opacity: 0.6,
+                      child: Container(
+                        width: 150, // 원하는 너비를 설정하세요
+                        height: 250, // 16:9 비율에 따른 높이 (비디오의 종횡비에 따라 조절하세요)
+                        child: AspectRatio(
+                            aspectRatio:
+                                _videoPlayerController!.value.aspectRatio,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(30),
+                              child: VideoPlayer(_videoPlayerController!),
+                            )),
+                      ),
+                    ),
+                  ),
               ],
             );
           } else {
@@ -169,11 +200,11 @@ class _A_Dance_Film_State extends State<A_Dance_Film> {
               if (isRecording) {
                 // isRecording이 true일 때의 동작
                 // stopRecording();
-                player.stop();
+                _videoPlayerController?.pause();
               } else {
                 // isRecording이 false일 때의 동작
                 startCountdown();
-                player.play(AssetSource('songs/countdown.mp3'));
+                counter.play(AssetSource('songs/countdown.mp3'));
               }
               setState(() {
                 isRecording = !isRecording; // isRecording 상태를 전환합니다.
@@ -201,7 +232,7 @@ class _A_Dance_Film_State extends State<A_Dance_Film> {
   @override
   void dispose() {
     _cameraController?.dispose();
-    player.dispose();
+    _videoPlayerController?.dispose();
     counter.dispose();
     super.dispose();
   }
