@@ -1,6 +1,30 @@
+import 'dart:io';
+
 import 'package:a_dance/pages/a-dance_film.dart';
 import 'package:a_dance/pages/a-dance_main.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+
+Future<String> downloadVideo(String videoId) async {
+  final yt = YoutubeExplode();
+  final manifest = await yt.videos.streamsClient.getManifest(videoId);
+  // final streamInfo = manifest.muxed.withHighestBitrate();
+  final streamInfo = manifest.muxed.last;
+
+  var stream = yt.videos.streamsClient.get(streamInfo);
+  final directory = await getTemporaryDirectory();
+
+  final file = File('${directory.path}/downloaded.mp4');
+  final fileStream = file.openWrite();
+
+  await stream.pipe(fileStream); // 다운로드 및 파일에 저장
+  fileStream.close();
+  yt.close();
+
+  print('file\'s path = ${file.path}');
+  return file.path;
+}
 
 class Select_Song extends StatefulWidget {
   @override
@@ -12,6 +36,8 @@ class _Select_SongState extends State<Select_Song> {
   String inputText = '7HDeem-JaSY';
   String artist = "아티스트";
   String title = "제목";
+  bool isLoading = false;
+  String filepath = '';
 
   @override
   Widget build(BuildContext context) {
@@ -63,18 +89,31 @@ class _Select_SongState extends State<Select_Song> {
                       width: 4,
                     ),
                     IconButton(
-                      onPressed: () {
+                      onPressed: () async {
                         setState(() {
-                          RegExp regExp = RegExp(
-                              r'(?:youtube\.com/watch\?v=|youtu\.be/)([^&]+)');
-                          Match? match = regExp.firstMatch(myController.text);
+                          isLoading = true; // 로딩 시작
+                        });
 
-                          if (match != null) {
-                            inputText = match.group(1) ?? '';
-                          }
+                        RegExp regExp = RegExp(
+                            r'(?:youtube\.com/watch\?v=|youtu\.be/|youtube\.com/shorts/)([^&?]+)');
+                        Match? match = regExp.firstMatch(myController.text);
+
+                        if (match != null) {
+                          inputText = match.group(1) ?? '';
+                          print('inputText = ${inputText}');
+                          // String downloadUrl =
+                          //     "http://64.176.226.248:8001/download/$inputText"; // 임시 Url
+                          filepath = await downloadVideo(inputText);
+                          print('filepath = $filepath');
+                        }
+
+                        setState(() {
+                          isLoading = false; // 로딩 종료
                         });
                       },
-                      icon: Icon(Icons.search),
+                      icon: isLoading
+                          ? CircularProgressIndicator()
+                          : Icon(Icons.search),
                     )
                   ],
                 ),
@@ -194,7 +233,8 @@ class _Select_SongState extends State<Select_Song> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => A_Dance_Film()));
+                            builder: (context) =>
+                                A_Dance_Film(videoPath: filepath)));
                   },
                   child: Text(
                     '촬영하러 가기',
