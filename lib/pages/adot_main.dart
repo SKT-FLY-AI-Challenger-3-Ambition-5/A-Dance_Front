@@ -10,6 +10,7 @@ class Adot_Main extends StatelessWidget {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Bottom Navigation Bar',
       theme: ThemeData(
         primarySwatch: Colors.blue,

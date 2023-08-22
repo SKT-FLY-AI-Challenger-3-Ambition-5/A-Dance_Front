@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:a_dance/pages/a-dance_mypage.dart';
+import 'package:a_dance/pages/a-dance_youtube.dart';
 import 'package:a_dance/pages/adot_main.dart';
-import 'package:a_dance/pages/select_song.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
@@ -142,7 +142,7 @@ class A_Dance_Main extends StatelessWidget {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  Select_Song()));
+                                                  WebViewApp()));
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.blue,
