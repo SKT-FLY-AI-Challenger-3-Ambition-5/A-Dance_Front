@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:a_dance/pages/a-dance_film.dart';
 import 'package:a_dance/pages/a-dance_main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
@@ -33,11 +34,30 @@ class Select_Song extends StatefulWidget {
 
 class _Select_SongState extends State<Select_Song> {
   TextEditingController myController = TextEditingController();
-  String inputText = '7HDeem-JaSY';
+  String inputText = '';
   String artist = "아티스트";
   String title = "제목";
   bool isLoading = false;
   String filepath = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _checkClipboard();
+  }
+
+  _checkClipboard() async {
+    ClipboardData? clipboardData = await Clipboard.getData('text/plain');
+    if (clipboardData?.text != null) {
+      // 이 예제에서는 숫자를 찾는 정규 표현식을 사용합니다. 필요에 따라 수정하세요.
+      RegExp regExp = RegExp(
+          r'(?:youtube\.com/watch\?v=|youtu\.be/|youtube\.com/shorts/)([^&?]+)');
+      var match = regExp.firstMatch(clipboardData!.text!);
+      if (match != null) {
+        myController.text = match.group(0) ?? '';
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +133,7 @@ class _Select_SongState extends State<Select_Song> {
                       },
                       icon: isLoading
                           ? CircularProgressIndicator()
-                          : Icon(Icons.search),
+                          : Icon(Icons.download),
                     )
                   ],
                 ),
@@ -128,8 +148,14 @@ class _Select_SongState extends State<Select_Song> {
                   ),
                 ),
                 ClipRect(
-                  child: Image.network(
-                      'https://img.youtube.com/vi/$inputText/mqdefault.jpg'),
+                  child: inputText.isEmpty
+                      ? Container(
+                          width: 320, // 네모 박스의 가로 크기
+                          height: 180, // 네모 박스의 세로 크기
+                          color: Colors.black,
+                        )
+                      : Image.network(
+                          'https://img.youtube.com/vi/$inputText/mqdefault.jpg'),
                 ),
                 SizedBox(
                   height: 12,
@@ -229,13 +255,15 @@ class _Select_SongState extends State<Select_Song> {
                   height: 12,
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                A_Dance_Film(videoPath: filepath)));
-                  },
+                  onPressed: filepath.isEmpty
+                      ? null
+                      : () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      A_Dance_Film(videoPath: filepath)));
+                        },
                   child: Text(
                     '촬영하러 가기',
                     style: TextStyle(
