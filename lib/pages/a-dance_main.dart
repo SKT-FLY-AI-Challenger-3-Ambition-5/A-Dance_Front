@@ -8,22 +8,23 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-Future<String> fetchData(String url_str) async {
+Future<String?> fetchData(String url_str) async {
   final url = Uri.parse(url_str);
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
     return response.body;
   } else {
-    throw Exception('Failed to load data');
+    return null; // Return null if the request failed
   }
 }
 
 Future<List<String?>> fetchVideoId(String searchTerm) async {
   final url = Uri.parse(
-      'https://www.googleapis.com/youtube/v3/search?part=snippet&q=$searchTerm&key=AIzaSyAYjK0kwHzzH7pUsfKViLQpmwaJwAGeJKo&type=video&maxResults=1');
+      'https://www.googleapis.com/youtube/v3/search?part=snippet&q=$searchTerm&key=AIzaSyDgkHTDhrsOczTCQMsNRfG9JZKQQI01gRI&type=video&maxResults=1');
 
   final response = await http.get(url);
+  print('response.statusCode = ${response.statusCode}');
 
   if (response.statusCode == 200) {
     var data = jsonDecode(response.body);
@@ -35,16 +36,29 @@ Future<List<String?>> fetchVideoId(String searchTerm) async {
     }
   }
 
-  return [null];
+  return [
+    null,
+    null
+  ]; // Return two null values if the request failed or data['items'] is empty
 }
 
-Future<List<dynamic>> fetchMulti(String url_str) async {
-  String Data = await fetchData(url_str);
+Future<List<String?>> fetchMulti(String url_str) async {
+  String? Data = await fetchData(url_str);
 
-  List<dynamic> hotContents = jsonDecode(Data!)['hot_contents'];
+  if (Data == null) {
+    return [
+      null,
+      null,
+      null,
+      null
+    ]; // Return four null values if the request failed
+  }
+
+  List<dynamic> hotContents = jsonDecode(Data)['hot_contents'];
 
   String title1 = hotContents[0]['title'];
   String title2 = hotContents[1]['title'];
+  print('title1 = $title1');
 
   List<String?> video1 = await fetchVideoId(title1);
   List<String?> video2 = await fetchVideoId(title2);
@@ -55,7 +69,12 @@ Future<List<dynamic>> fetchMulti(String url_str) async {
   String? video2_id = video2[0];
   String? video2_title = video2[1];
 
-  return [video1_id, video1_title, video2_id, video2_title]; // 두 결과값을 리스트로 반환
+  return [
+    video1_id,
+    video1_title,
+    video2_id,
+    video2_title
+  ]; // Return the results as a list
 }
 
 class A_Dance_Main extends StatelessWidget {
@@ -87,23 +106,30 @@ class A_Dance_Main extends StatelessWidget {
               return Center(
                 child: CircularProgressIndicator(),
               );
-            } else if (snapshot.hasError) {
-              // 에러 발생 시 에러 메시지 표시
-              return Text('Error: ${snapshot.error}');
             } else {
               // 데이터 로드 완료. 이곳에서 응답 데이터를 사용하여 위젯을 렌더링.
               final responseData = snapshot.data;
 
               String? video1_id = responseData?[0];
               String? video1_title = responseData?[1];
-              if (video1_title!.length > 20) {
+              if (video1_title != null && video1_title!.length > 20) {
                 video1_title = video1_title.substring(0, 17) + "...";
               }
 
               String? video2_id = responseData?[2];
               String? video2_title = responseData?[3];
-              if (video2_title!.length > 20) {
+              if (video2_title != null && video2_title!.length > 20) {
                 video2_title = video2_title.substring(0, 17) + "...";
+              }
+
+              if (video1_id == null &&
+                  video1_title == null &&
+                  video2_id == null &&
+                  video2_title == null) {
+                video1_id = 'VOC83aZy_NI';
+                video1_title = '로딩 실패';
+                video2_id = 'VOC83aZy_NI';
+                video2_title = '로딩 실패';
               }
 
               return SingleChildScrollView(

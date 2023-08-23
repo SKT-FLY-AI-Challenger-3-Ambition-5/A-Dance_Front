@@ -2,29 +2,32 @@ import 'dart:io';
 
 import 'package:a_dance/pages/a-dance_film.dart';
 import 'package:a_dance/pages/a-dance_main.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
-Future<String> downloadVideo(String videoId) async {
-  final yt = YoutubeExplode();
-  final manifest = await yt.videos.streamsClient.getManifest(videoId);
-  // final streamInfo = manifest.muxed.withHighestBitrate();
-  final streamInfo = manifest.muxed.last;
+Future<String> downloadVideo(String youtubeUrl) async {
+  final Dio dio = Dio();
+  final response = await dio.get(
+    "http://211.57.200.6:8001/download/", // url 변경 필요
+    queryParameters: {"url": youtubeUrl},
+    options: Options(
+      responseType: ResponseType.bytes,
+      followRedirects: false,
+      validateStatus: (status) {
+        return status! < 500;
+      },
+    ),
+  );
 
-  var stream = yt.videos.streamsClient.get(streamInfo);
   final directory = await getTemporaryDirectory();
-
   final file = File('${directory.path}/downloaded.mp4');
-  final fileStream = file.openWrite();
-
-  await stream.pipe(fileStream); // 다운로드 및 파일에 저장
-  fileStream.close();
-  yt.close();
+  await file.writeAsBytes(response.data); // response.data가 여러개 올 예정
 
   print('file\'s path = ${file.path}');
-  return file.path;
+  return file
+      .path; // return 값에 file.path, song_info.title, song_info.artist 포함 예정
 }
 
 class Select_Song extends StatefulWidget {
@@ -75,12 +78,12 @@ class _Select_SongState extends State<Select_Song> {
           automaticallyImplyLeading: true,
           leading: BackButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => A_Dance_Main(),
-                ),
-              );
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => A_Dance_Main(),
+                  ),
+                  (route) => false);
             },
           ),
         ),
@@ -123,7 +126,7 @@ class _Select_SongState extends State<Select_Song> {
                           print('inputText = ${inputText}');
                           // String downloadUrl =
                           //     "http://64.176.226.248:8001/download/$inputText"; // 임시 Url
-                          filepath = await downloadVideo(inputText);
+                          filepath = await downloadVideo(myController.text);
                           print('filepath = $filepath');
                         }
 
