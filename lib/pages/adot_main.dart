@@ -144,7 +144,7 @@ class Main1 extends StatelessWidget {
           );
         },
         icon: Icon(Icons.music_note,
-        color: Color.(0xFF3F3FFF)), // 아이콘 설정
+        color: Color(0xFF3F3FFF)), // 아이콘 설정
         alignment: Alignment.centerLeft, // 아이콘 왼쪽 정렬
       ),
       SizedBox(width: 15), // 아이콘과 텍스트 사이 간격
