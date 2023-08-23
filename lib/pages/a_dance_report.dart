@@ -568,56 +568,61 @@ class ReportApp extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  shadowColor: Colors.transparent,
-                                  elevation: 10, // 그림자의 깊이 조절
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(100),
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 10),
-                                ),
-                                child: Ink(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment(0.00, -1.00),
-                                      end: Alignment(0, 1),
-                                      colors: [
-                                        Color(0xFFCFCFFB),
-                                        Color(0xFFE7E7FF)
-                                      ],
+                              Container(
+                                width:350,
+                                child: ElevatedButton(
+                                  
+                                  onPressed: () {},
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white70,
+                                    shadowColor: Colors.transparent,
+                                    elevation: 10, // 그림자의 깊이 조절
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(100),
                                     ),
-                                    borderRadius: BorderRadius.circular(20.0),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 10),
                                   ),
-                                  child: Container(
-                                    constraints: BoxConstraints(
-                                        minWidth: 160, minHeight: 48),
-                                    alignment: Alignment.center,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        SizedBox(
-                                          width: 100,
-                                        ),
-                                        Icon(
-                                            CupertinoIcons
-                                                .hand_point_right_fill,
-                                            color: Colors.amber),
-                                        Text(
-                                          " 0:03~0:06",
-                                          style: TextStyle(
-                                              fontFamily: 'Inter',
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 24,
-                                              color: Colors.black),
-                                        ),
-                                        SizedBox(
-                                          width: 100,
-                                        ),
-                                      ],
+                                  child: Ink(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment(0.00, -1.00),
+                                        end: Alignment(0, 1),
+                                        colors: [
+                                          Color(0xFFCFCFFB),
+                                          Color(0xFFE7E7FF)
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    child: Container(
+                                      constraints: BoxConstraints(
+                                          minWidth: 160, minHeight: 48),
+                                      alignment: Alignment.center,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          // SizedBox(
+                                          //   width: 100,
+                                          // ),
+                                          Icon(
+                                              CupertinoIcons
+                                                  .hand_point_right_fill,
+                                              color: Colors.amber),
+                                          Text(
+                                            " 0:03~0:06",
+                                            style: TextStyle(
+                                                fontFamily: 'Inter',
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 24,
+                                                color: Colors.black),
+                                          ),
+                                          // SizedBox(
+                                          //   width: 100,
+                                          // ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -626,96 +631,102 @@ class ReportApp extends StatelessWidget {
                           ),
                           SizedBox(height: 20.0),
                           ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              shadowColor: Colors.transparent,
-                              elevation: 10, // 그림자의 깊이 조절
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 50, horizontal: 40),
-                            ),
-                            child: Row(
-                              children: [
-                                Image.asset(
-                                  "images/example.png",
-                                  width: 100,
-                                  height: 190,
-                                ),
-                                SizedBox(width: 30),
-                                SizedBox(
-                                  width: 150,
-                                  height: 70,
-                                  child: Text(
-                                    '음악과 박자를 맞추어 보세요!',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 20,
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+  onPressed: () {},
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Color.fromRGBO(255, 255, 255, 20),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(50),
+    ),
+    padding: EdgeInsets.symmetric(vertical: 50, horizontal: 40),
+    elevation: 30, // 그림자의 깊이 조절
+    shadowColor: Colors.grey.withOpacity(0.7), // 그림자 색상과 투명도 조절
+  ),
+  child: Row(
+    children: [
+      Image.asset(
+        "images/example.png",
+        width: 100,
+        height: 190,
+      ),
+      SizedBox(width: 30),
+      SizedBox(
+        width: 150,
+        height: 70,
+        child: Text(
+          '음악과 박자를 맞추어 보세요!',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    ],
+  ),
+),
+
                           SizedBox(
                             height: 30,
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  shadowColor: Colors.transparent,
-                                  elevation: 10, // 그림자의 깊이 조절
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(100),
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 10),
-                                ),
-                                child: Ink(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment(0.00, -1.00),
-                                      end: Alignment(0, 1),
-                                      colors: [
-                                        Color(0xFFCFCFFB),
-                                        Color(0xFFE7E7FF)
-                                      ],
+                              Container(
+                                width:350,
+                                child: ElevatedButton(
+                                  onPressed: () {},
+                                   
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white70,
+                                    shadowColor: Colors.transparent,
+                                    elevation: 10, // 그림자의 깊이 조절
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(100),
                                     ),
-                                    borderRadius: BorderRadius.circular(20.0),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 10),
                                   ),
-                                  child: Container(
-                                    constraints: BoxConstraints(
-                                        minWidth: 160, minHeight: 48),
-                                    alignment: Alignment.center,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        SizedBox(
-                                          width: 100,
-                                        ),
-                                        Icon(
-                                            CupertinoIcons
-                                                .hand_point_right_fill,
-                                            color: Colors.amber),
-                                        Text(
-                                          " 0:12~0:15",
-                                          style: TextStyle(
-                                              fontFamily: 'Inter',
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 24,
-                                              color: Colors.black),
-                                        ),
-                                        SizedBox(
-                                          width: 100,
-                                        ),
-                                      ],
+                                  child: Ink(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment(0.00, -1.00),
+                                        end: Alignment(0, 1),
+                                        colors: [
+                                          Color(0xFFCFCFFB),
+                                          Color(0xFFE7E7FF)
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    child: Container(
+                                      constraints: BoxConstraints(
+                                          minWidth: 160, minHeight: 48),
+                                      alignment: Alignment.center,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          // SizedBox(
+                                          //   width: 100,
+                                          // ),
+                                          Icon(
+                                              CupertinoIcons
+                                                  .hand_point_right_fill,
+                                              color: Colors.amber),
+                                          Text(
+                                            " 0:12~0:15",
+                                            style: TextStyle(
+                                                fontFamily: 'Inter',
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 24,
+                                                color: Colors.black),
+                                          ),
+                                          // SizedBox(
+                                          //   width: 100,
+                                          // ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -726,6 +737,7 @@ class ReportApp extends StatelessWidget {
                           ElevatedButton(
                             onPressed: () {},
                             style: ElevatedButton.styleFrom(
+                              backgroundColor: Color.fromRGBO(255, 255, 255, 20),
                               shadowColor: Colors.transparent,
                               elevation: 10, // 그림자의 깊이 조절
                               shape: RoundedRectangleBorder(
@@ -767,9 +779,11 @@ class ReportApp extends StatelessWidget {
                               ElevatedButton(
                                 onPressed: () {},
                                 style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white70,
                                   shadowColor: Colors.transparent,
                                   elevation: 10, // 그림자의 깊이 조절
                                   shape: RoundedRectangleBorder(
+                                    
                                     borderRadius: BorderRadius.circular(100),
                                   ),
                                   padding: EdgeInsets.symmetric(
@@ -824,6 +838,7 @@ class ReportApp extends StatelessWidget {
                           ElevatedButton(
                             onPressed: () {},
                             style: ElevatedButton.styleFrom(
+                              backgroundColor: Color.fromRGBO(255, 255, 255, 20),
                               shadowColor: Colors.transparent,
                               elevation: 10, // 그림자의 깊이 조절
                               shape: RoundedRectangleBorder(
