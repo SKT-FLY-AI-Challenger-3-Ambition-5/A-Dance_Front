@@ -135,10 +135,12 @@ class Main1 extends StatelessWidget {
                           Flexible(
                             child: ElevatedButton(
                               onPressed: () {
-                                Navigator.push(
+                                Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => A_Dance_Main()));
+                                        builder: (BuildContext context) =>
+                                            A_Dance_Main()),
+                                    (route) => false);
                               },
                               style: ButtonStyle(),
                               child: const Text('에이단스 하러가기'),
