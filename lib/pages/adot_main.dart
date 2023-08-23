@@ -135,18 +135,24 @@ class Main1 extends StatelessWidget {
   child: Row(
     children: [
       SizedBox(width:15),
-      IconButton(
-        onPressed: () {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (BuildContext context) => A_Dance_Main()),
-            (route) => false,
-          );
-        },
-        icon: Icon(Icons.music_note,
-        color: Color(0xFF3F3FFF)), // 아이콘 설정
-        alignment: Alignment.centerLeft, // 아이콘 왼쪽 정렬
-      ),
+      InkWell(
+  onTap: () {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (BuildContext context) => A_Dance_Main()),
+      (route) => false,
+    );
+  },
+  child: Container(
+    alignment: Alignment.centerLeft,
+    child: Image.asset(
+      'images/logo2.png', // 이미지 파일 경로
+      width: 70, // 이미지의 가로 크기
+      height: 70, // 이미지의 세로 크기
+       // 이미지 컬러
+    ),
+  ),
+),
       SizedBox(width: 15), // 아이콘과 텍스트 사이 간격
       Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -157,7 +163,7 @@ class Main1 extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontFamily: "Inter",
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w700,
               color: Colors.black,
             ),
           ),
@@ -165,12 +171,12 @@ class Main1 extends StatelessWidget {
           Container(
             width:230,
             child: Text(
-              '인기 있는 숏폼 컨텐츠를 나만의  AI 어시스턴트와 함께 연습하고 제작해보세요',
+              '인기 있는 숏폼 컨텐츠를 나만의 AI 코치와 함께 연습하고 제작해보세요',
               style: TextStyle(
                 fontSize: 14,
                 fontFamily: "Inter",
                 color: Colors.grey,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w400,
               ),
             ),
           ),
