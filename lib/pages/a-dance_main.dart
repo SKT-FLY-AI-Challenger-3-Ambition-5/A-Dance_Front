@@ -42,6 +42,51 @@ Future<List<String?>> fetchVideoId(String searchTerm) async {
   ]; // Return two null values if the request failed or data['items'] is empty
 }
 
+Future<List<String?>> getScore(String title) async {
+  try {
+    final url = 'http://141.164.39.68:8000/api/get_leaderboard'; // Set your URL
+    final headers = {
+      'Content-Type': 'application/json',
+    };
+
+    final body = jsonEncode({
+      'title': title,
+      'num': 1,
+    });
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      final leaderboard = responseData['leaderboard'];
+      if (leaderboard != null && leaderboard.isNotEmpty) {
+        final username = leaderboard[0]['username'];
+        final score = leaderboard[0]['score'];
+        return [username, score.toString()]; // Convert score to string
+      }
+      return [
+        'Error: Empty leaderboard',
+        null
+      ]; // Return an error message in the list if leaderboard is empty
+    } else {
+      return [
+        'Error: HTTP ${response.statusCode}',
+        null
+      ]; // Return an error message in the list for non-200 responses
+    }
+  } catch (e) {
+    print('Error fetching score: $e');
+    return [
+      'Error: Exception',
+      null
+    ]; // Return an error message in the list for exceptions
+  }
+}
+
 Future<List<String?>> fetchMulti(String url_str) async {
   String? Data = await fetchData(url_str);
 
@@ -58,7 +103,7 @@ Future<List<String?>> fetchMulti(String url_str) async {
 
   String title1 = hotContents[0]['title'];
   String title2 = hotContents[1]['title'];
-  print('title1 = $title1');
+  title2 = title2.replaceAll('â', '’');
 
   List<String?> video1 = await fetchVideoId(title1);
   List<String?> video2 = await fetchVideoId(title2);
@@ -69,11 +114,24 @@ Future<List<String?>> fetchMulti(String url_str) async {
   String? video2_id = video2[0];
   String? video2_title = video2[1];
 
+  List<String?> video1_top = await getScore(title1);
+  List<String?> video2_top = await getScore(title2);
+
+  String? video1_top_username = video1_top[0];
+  String? video1_top_score = video1_top[1];
+
+  String? video2_top_username = video2_top[0];
+  String? video2_top_score = video2_top[1];
+
   return [
     video1_id,
     video1_title,
     video2_id,
-    video2_title
+    video2_title,
+    video1_top_username,
+    video1_top_score,
+    video2_top_username,
+    video2_top_score
   ]; // Return the results as a list
 }
 
@@ -122,10 +180,19 @@ class A_Dance_Main extends StatelessWidget {
                 video2_title = video2_title.substring(0, 17) + "...";
               }
 
+              String? video1_top_username = responseData?[4];
+              String? video1_top_score = responseData?[5];
+              String? video2_top_username = responseData?[6];
+              String? video2_top_score = responseData?[7];
+
               if (video1_id == null &&
                   video1_title == null &&
                   video2_id == null &&
-                  video2_title == null) {
+                  video2_title == null &&
+                  video1_top_username == null &&
+                  video1_top_score == null &&
+                  video2_top_username == null &&
+                  video2_top_score == null) {
                 video1_id = 'VOC83aZy_NI';
                 video1_title = '로딩 실패';
                 video2_id = 'VOC83aZy_NI';
@@ -331,7 +398,7 @@ class A_Dance_Main extends StatelessWidget {
                                             controller: YoutubePlayerController(
                                               initialVideoId: '$video1_id',
                                               flags: const YoutubePlayerFlags(
-                                                autoPlay: true,
+                                                autoPlay: false,
                                                 mute: true,
                                                 hideControls: true,
                                               ),
@@ -421,30 +488,14 @@ class A_Dance_Main extends StatelessWidget {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      LeaderBoardCell(img: 'images/char1.png'),
-                                      LeaderBoardCell(img: 'images/char3.png'),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      LeaderBoardCell(img: 'images/char3.png'),
-                                      LeaderBoardCell(img: 'images/char1.png'),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      LeaderBoardCell(img: 'images/char1.png'),
-                                      LeaderBoardCell(img: 'images/char3.png'),
+                                      LeaderBoardCell(
+                                          img: 'images/char1.png',
+                                          username: video1_top_username,
+                                          score: video1_top_score),
+                                      LeaderBoardCell(
+                                          img: 'images/char3.png',
+                                          username: video2_top_username,
+                                          score: video2_top_score),
                                     ],
                                   ),
                                   SizedBox(
@@ -508,10 +559,14 @@ class RecentPlayedSong extends StatelessWidget {
 
 class LeaderBoardCell extends StatelessWidget {
   final String img;
+  final String? username;
+  final String? score;
 
   const LeaderBoardCell({
     super.key,
     required this.img,
+    required this.username,
+    required this.score,
   });
 
   @override
@@ -539,21 +594,21 @@ class LeaderBoardCell extends StatelessWidget {
                     height: 80,
                   ),
                   SizedBox(
-                    width: 10,
+                    width: 30,
                   ),
                   Column(
                     children: [
-                      Text('최고 점수'),
+                      Text('$username'),
                       Text(
-                        '938',
+                        '최고 점수',
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 12,
                         ),
                       ),
                       Text(
-                        '최근 플레이 곡',
+                        '$score',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 13,
                         ),
                       ),
                     ],

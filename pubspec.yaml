@@ -45,6 +45,7 @@ dependencies:
   webview_flutter: ^4.2.2
   syncfusion_flutter_charts:
   dio:
+  tuple:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -76,9 +77,6 @@ flutter:
   assets:
      - assets/
      - images/
-     - model/lite-model_movenet_singlepose_lightning_tflite_float16_4.tflite
-     - model/posenet_mv1_075_float_from_checkpoints.tflite
-     - assets/songs/hong.mp3
      - assets/songs/countdown.mp3
 
   # An image asset can refer to one or more resolution-specific "variants", see
