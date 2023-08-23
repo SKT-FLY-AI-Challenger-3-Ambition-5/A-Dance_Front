@@ -143,9 +143,19 @@ class A_Dance_Main extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xFFE5E4EE),
       appBar: AppBar(
-        title: Text('에이단ㅡ스'),
+        backgroundColor: Colors.white,
+        title: Text(
+          '에이단ㅡ스',
+          style: TextStyle(
+            fontSize: 18,
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
+        centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black,),
           onPressed: () {
             Navigator.pushAndRemoveUntil(
                 context,
@@ -154,10 +164,11 @@ class A_Dance_Main extends StatelessWidget {
                 (route) => false);
           },
         ),
+        toolbarHeight: 60.0,
       ),
       body: FutureBuilder<List<dynamic>>(
           future:
-              fetchMulti('http://141.164.39.68:8000/api/get_hot_contents/2'),
+              fetchMulti('http://158.247.216.31:8000/api/get_hot_contents/2'),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               // 데이터가 아직 로드되지 않았을 때 로딩 인디케이터 표시
@@ -212,7 +223,7 @@ class A_Dance_Main extends StatelessWidget {
                           borderRadius: BorderRadius.circular(15),
                           color: Colors.white,
                         ),
-                        height: 250,
+                        height: 270,
                         child: Row(
                           children: [
                             SizedBox(
@@ -229,6 +240,7 @@ class A_Dance_Main extends StatelessWidget {
                                     image: AssetImage('images/adot-char2.gif'),
                                     height: 180,
                                   ),
+                                  SizedBox(height: 10),
                                   ElevatedButton(
                                     onPressed: () {
                                       Navigator.push(
@@ -238,15 +250,21 @@ class A_Dance_Main extends StatelessWidget {
                                                   WebViewApp()));
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blue,
+                                      backgroundColor: Color(0xFF3F3FFF),
+                                      shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20), // 버튼 모서리를 둥글게 만듦
+      
+    ),
+    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                                     ),
                                     child: const Text(
-                                      '연습하러가기',
+                                      ' 연습하러가기 ',
                                       style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
+                                fontSize: 15,
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                                     ),
                                   ),
                                 ],
@@ -264,14 +282,20 @@ class A_Dance_Main extends StatelessWidget {
                                       '내 최고 점수',
                                       style: TextStyle(
                                         fontSize: 18,
+                                        fontFamily: 'Inter',
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
+                                    SizedBox(height:3,),
                                     Text(
-                                      '999',
+                                      
+                                      '   98.9',
                                       style: TextStyle(
-                                        fontSize: 18,
-                                      ),
+                                        color: Colors.black87,
+                                fontSize: 26,
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w700,
+                              ),
                                     ),
                                     SizedBox(
                                       height: 20,
@@ -279,12 +303,12 @@ class A_Dance_Main extends StatelessWidget {
                                     Text(
                                       '최근 플레이 곡',
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 17,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     SizedBox(
-                                      height: 20,
+                                      height: 18,
                                     ),
                                     Row(
                                       children: [
@@ -294,16 +318,16 @@ class A_Dance_Main extends StatelessWidget {
                                           width: 10,
                                         ),
                                         RecentPlayedSong(
-                                            img: 'images/new_jeans.png'),
+                                            img: 'images/aespa.jpeg'),
                                         SizedBox(
                                           width: 10,
                                         ),
                                         RecentPlayedSong(
-                                            img: 'images/new_jeans.png'),
+                                            img: 'images/lesserafim.jpeg'),
                                       ],
                                     ),
                                     SizedBox(
-                                      height: 20,
+                                      height: 28,
                                     ),
                                     ElevatedButton(
                                       onPressed: () {
@@ -315,15 +339,21 @@ class A_Dance_Main extends StatelessWidget {
                                         );
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.blue,
-                                      ),
+                                backgroundColor:Color(0xFF3F3FFF),
+                                shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20), // 버튼 모서리를 둥글게 만듦
+      
+    ),
+    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                              ),
                                       child: const Text(
                                         '마이 페이지로 이동',
                                         style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
+                                  fontSize: 15,
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                                       ),
                                     ),
                                   ],
@@ -597,18 +627,21 @@ class LeaderBoardCell extends StatelessWidget {
                     width: 30,
                   ),
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text('$username'),
-                      Text(
-                        '최고 점수',
-                        style: TextStyle(
-                          fontSize: 12,
-                        ),
-                      ),
+                      Text('최고 점수',
+                      style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),),
                       Text(
                         '$score',
                         style: TextStyle(
                           fontSize: 13,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
