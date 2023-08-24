@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -5,12 +6,14 @@ import 'package:a_dance/pages/a-dance_video_player.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:tuple/tuple.dart';
 import 'package:video_player/video_player.dart';
 
 class A_Dance_Film extends StatefulWidget {
   final String videoPath;
+  final List<List<Offset>> allFramesKeypoints;
 
-  A_Dance_Film({required this.videoPath});
+  A_Dance_Film({required this.videoPath, required this.allFramesKeypoints});
 
   @override
   _A_Dance_Film_State createState() => _A_Dance_Film_State();
@@ -19,11 +22,15 @@ class A_Dance_Film extends StatefulWidget {
 class _A_Dance_Film_State extends State<A_Dance_Film> {
   CameraController? _cameraController;
   Future<void>? _initializeCameraFuture;
-  int countdownValue = 3;
+  int countdownValue = 5;
   late AudioPlayer counter;
   bool isRecording = false;
   String? videoPath; // 녹화된 동영상의 경로를 저장합니다.
   VideoPlayerController? _videoPlayerController;
+  late List<List<Offset>> allFramesKeypoints;
+  List<Offset> currentFrameKeypoints = [];
+  int currentFrameIndex = 0;
+  Timer? timer;
 
   @override
   void initState() {
@@ -35,6 +42,16 @@ class _A_Dance_Film_State extends State<A_Dance_Film> {
         setState(() {});
         _videoPlayerController?.addListener(_videoListener); // 리스너 추가
       });
+    allFramesKeypoints = widget.allFramesKeypoints;
+    updateFrame();
+    currentFrameIndex = 0;
+  }
+
+  void updateFrame() {
+    setState(() {
+      currentFrameKeypoints = allFramesKeypoints[currentFrameIndex];
+      currentFrameIndex = (currentFrameIndex + 1) % allFramesKeypoints.length;
+    });
   }
 
   _initializeCamera() async {
@@ -76,6 +93,8 @@ class _A_Dance_Film_State extends State<A_Dance_Film> {
       } else {
         await _cameraController?.startVideoRecording();
         await _videoPlayerController?.play();
+        timer = Timer.periodic(
+            Duration(milliseconds: 1000 ~/ 30), (Timer t) => updateFrame());
       }
     });
   }
@@ -103,9 +122,11 @@ class _A_Dance_Film_State extends State<A_Dance_Film> {
 
     // 다른 상태 초기화 (예: countdownValue, isRecording 등)
     setState(() {
-      countdownValue = 3;
+      countdownValue = 5;
       isRecording = false;
       videoPath = null;
+      currentFrameIndex = 0;
+      timer = null;
     });
 
     _videoPlayerController?.pause();
@@ -176,6 +197,10 @@ class _A_Dance_Film_State extends State<A_Dance_Film> {
                       ),
                     ),
                   ),
+                CustomPaint(
+                  painter: PosePainter(keypoints: currentFrameKeypoints),
+                  size: MediaQuery.of(context).size,
+                ),
               ],
             );
           } else {
@@ -236,4 +261,64 @@ class _A_Dance_Film_State extends State<A_Dance_Film> {
     counter.dispose();
     super.dispose();
   }
+}
+
+class PosePainter extends CustomPainter {
+  final List<Tuple2<int, int>> connections = [
+    Tuple2(0, 1),
+    Tuple2(0, 2),
+    Tuple2(3, 5),
+    Tuple2(4, 6),
+    Tuple2(5, 7),
+    Tuple2(6, 8),
+    Tuple2(9, 11),
+    Tuple2(10, 12),
+    Tuple2(11, 13),
+    Tuple2(12, 14),
+    Tuple2(3, 4),
+    Tuple2(4, 10),
+    Tuple2(10, 9),
+    Tuple2(9, 3)
+  ];
+  late final List<Offset> keypoints;
+  final Color lineColor = Colors.white.withOpacity(0.5);
+  final Color circleColor = Colors.orange.withOpacity(0.5);
+
+  PosePainter({required this.keypoints});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final linePaint = Paint()
+      ..color = lineColor
+      ..strokeWidth = 10.0;
+    final circlePaint = Paint()..color = circleColor;
+
+    // Draw connections
+    for (var connection in connections) {
+      if (connection.item1 < keypoints.length &&
+          connection.item2 < keypoints.length) {
+        final start = Offset(keypoints[connection.item1].dx * size.width,
+            keypoints[connection.item1].dy * size.height);
+        final end = Offset(keypoints[connection.item2].dx * size.width,
+            keypoints[connection.item2].dy * size.height);
+        canvas.drawLine(start, end, linePaint);
+      }
+    }
+
+    // Draw keypoints
+    for (var idx = 0; idx < 15; idx++) {
+      final point = Offset(
+          keypoints[idx].dx * size.width, keypoints[idx].dy * size.height);
+      if (idx == 0) {
+        canvas.drawCircle(point, 30.0, circlePaint);
+      } else if (idx == 1 || idx == 2) {
+        continue;
+      } else {
+        canvas.drawCircle(point, 10.0, circlePaint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
