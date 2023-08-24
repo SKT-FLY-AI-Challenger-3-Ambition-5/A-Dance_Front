@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:a_dance/main.dart';
 import 'package:a_dance/pages/a-dance_mypage.dart';
 import 'package:a_dance/pages/a-dance_youtube.dart';
 import 'package:a_dance/pages/adot_main.dart';
@@ -44,7 +45,7 @@ Future<List<String?>> fetchVideoId(String searchTerm) async {
 
 Future<List<String?>> getScore(String title) async {
   try {
-    final url = 'http://141.164.39.68:8000/api/get_leaderboard'; // Set your URL
+    final url = '$URL/api/get_leaderboard'; // Set your URL
     final headers = {
       'Content-Type': 'application/json',
     };
@@ -68,21 +69,23 @@ Future<List<String?>> getScore(String title) async {
         final score = leaderboard[0]['score'];
         return [username, score.toString()]; // Convert score to string
       }
+      print('Error: Empty leaderboard');
       return [
-        'Error: Empty leaderboard',
-        null
+        'User1',
+        '80'
       ]; // Return an error message in the list if leaderboard is empty
     } else {
+      print('Error: HTTP ${response.statusCode}');
       return [
-        'Error: HTTP ${response.statusCode}',
-        null
+        'User1',
+        '80'
       ]; // Return an error message in the list for non-200 responses
     }
   } catch (e) {
     print('Error fetching score: $e');
     return [
-      'Error: Exception',
-      null
+      'User1',
+      '80'
     ]; // Return an error message in the list for exceptions
   }
 }
@@ -155,7 +158,10 @@ class A_Dance_Main extends StatelessWidget {
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black,),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.black,
+          ),
           onPressed: () {
             Navigator.pushAndRemoveUntil(
                 context,
@@ -167,8 +173,7 @@ class A_Dance_Main extends StatelessWidget {
         toolbarHeight: 60.0,
       ),
       body: FutureBuilder<List<dynamic>>(
-          future:
-              fetchMulti('http://158.247.216.31:8000/api/get_hot_contents/2'),
+          future: fetchMulti('$URL/api/get_hot_contents/2'),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               // 데이터가 아직 로드되지 않았을 때 로딩 인디케이터 표시
@@ -252,19 +257,20 @@ class A_Dance_Main extends StatelessWidget {
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Color(0xFF3F3FFF),
                                       shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(20), // 버튼 모서리를 둥글게 만듦
-      
-    ),
-    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                                        borderRadius: BorderRadius.circular(
+                                            20), // 버튼 모서리를 둥글게 만듦
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 12, horizontal: 20),
                                     ),
                                     child: const Text(
                                       ' 연습하러가기 ',
                                       style: TextStyle(
-                                fontSize: 15,
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
+                                        fontSize: 15,
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -286,16 +292,17 @@ class A_Dance_Main extends StatelessWidget {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    SizedBox(height:3,),
+                                    SizedBox(
+                                      height: 3,
+                                    ),
                                     Text(
-                                      
                                       '   98.9',
                                       style: TextStyle(
                                         color: Colors.black87,
-                                fontSize: 26,
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w700,
-                              ),
+                                        fontSize: 26,
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
                                     SizedBox(
                                       height: 20,
@@ -339,21 +346,22 @@ class A_Dance_Main extends StatelessWidget {
                                         );
                                       },
                                       style: ElevatedButton.styleFrom(
-                                backgroundColor:Color(0xFF3F3FFF),
-                                shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(20), // 버튼 모서리를 둥글게 만듦
-      
-    ),
-    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                              ),
+                                        backgroundColor: Color(0xFF3F3FFF),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              20), // 버튼 모서리를 둥글게 만듦
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 12, horizontal: 20),
+                                      ),
                                       child: const Text(
                                         '마이 페이지로 이동',
                                         style: TextStyle(
-                                  fontSize: 15,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
+                                          fontSize: 15,
+                                          fontFamily: 'Inter',
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -630,12 +638,14 @@ class LeaderBoardCell extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text('$username'),
-                      Text('최고 점수',
-                      style: TextStyle(
+                      Text(
+                        '최고 점수',
+                        style: TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                        ),),
+                        ),
+                      ),
                       Text(
                         '$score',
                         style: TextStyle(
