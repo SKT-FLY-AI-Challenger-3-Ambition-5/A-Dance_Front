@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:a_dance/main.dart';
 import 'package:a_dance/pages/a-dance_film.dart';
 import 'package:a_dance/pages/a-dance_main.dart';
 import 'package:dio/dio.dart';
@@ -13,7 +14,7 @@ import 'package:path_provider/path_provider.dart';
 Future<String> downloadVideo(String youtubeUrl) async {
   final Dio dio = Dio();
   final response = await dio.get(
-    "http://172.20.10.5:8000/download/", // url 변경 필요
+    "$FileServerURL/download/", // url 변경 필요
     queryParameters: {"url": youtubeUrl},
     options: Options(
       responseType: ResponseType.bytes,
@@ -35,8 +36,7 @@ Future<String> downloadVideo(String youtubeUrl) async {
 
 Future<Map<String, dynamic>> fetchDetails(String youtubeUrl) async {
   final response = await http.post(
-    // Uri.parse('$URL/api/user_request_download_youtube'),
-    Uri.parse('http://172.20.10.5:8001/download_youtube'),
+    Uri.parse('$URL/api/user_request_download_youtube'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
@@ -51,15 +51,20 @@ Future<Map<String, dynamic>> fetchDetails(String youtubeUrl) async {
 
     String title = responseData['title'];
     String artist = responseData['artist'];
-    // String youtube_url = responseData['youtube_url'];
+    String youtube_url = responseData['h_youtube_url'];
     List<dynamic> keypoints_tmp = responseData['keypoints'];
+
+    // print('title = $title');
+    // print('artist = $artist');
+    // print('youtube_url = $youtube_url');
+    // print('keypoints = $keypoints_tmp');
 
     return {
       'title': title,
       'artist': artist,
-      // 'youtube_url': youtube_url,
+      'youtube_url': youtube_url,
       'keypoints': keypoints_tmp
-    }; // 이 예에서는 전체 응답 데이터를 반환하였습니다.
+    };
   } else {
     throw Exception('Failed to load details');
   }
@@ -88,6 +93,7 @@ class _Select_SongState extends State<Select_Song> {
   String inputText = '';
   String artist = "아티스트";
   String title = "제목";
+  String youtube_url = '';
   bool isLoading = false;
   String filepath = '';
   late List<List<Offset>> allFramesKeypoints;
@@ -198,6 +204,7 @@ class _Select_SongState extends State<Select_Song> {
                                 await fetchDetails(myController.text);
                             title = fetchData['title'];
                             artist = fetchData['artist'];
+                            youtube_url = fetchData['youtube_url'];
                             // tmp_list[2].toString(); // youtube_url
                             allFramesKeypoints =
                                 decodeKeypoints(fetchData['keypoints']);
@@ -349,6 +356,9 @@ class _Select_SongState extends State<Select_Song> {
                                   builder: (context) => A_Dance_Film(
                                         videoPath: filepath,
                                         allFramesKeypoints: allFramesKeypoints,
+                                        youtube_url: youtube_url,
+                                        title: title,
+                                        artist: artist,
                                       )));
                         },
                   child: Text(

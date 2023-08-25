@@ -4,6 +4,7 @@ import 'package:a_dance/main.dart';
 import 'package:a_dance/pages/a-dance_mypage.dart';
 import 'package:a_dance/pages/a-dance_youtube.dart';
 import 'package:a_dance/pages/adot_main.dart';
+import 'package:a_dance/pages/songleaderboard.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
@@ -23,12 +24,13 @@ Future<String?> fetchData(String url_str) async {
 Future<List<String?>> fetchVideoId(String searchTerm) async {
   final url = Uri.parse(
       'https://www.googleapis.com/youtube/v3/search?part=snippet&q=$searchTerm&key=AIzaSyDgkHTDhrsOczTCQMsNRfG9JZKQQI01gRI&type=video&maxResults=1');
+  print('url = $url');
 
   final response = await http.get(url);
-  print('response.statusCode = ${response.statusCode}');
 
   if (response.statusCode == 200) {
     var data = jsonDecode(response.body);
+    print('data = $data');
     if (data['items'].isNotEmpty) {
       return [
         data['items'][0]['id']['videoId'],
@@ -103,13 +105,16 @@ Future<List<String?>> fetchMulti(String url_str) async {
   }
 
   List<dynamic> hotContents = jsonDecode(Data)['hot_contents'];
+  print('hotContents = $hotContents');
 
   String title1 = hotContents[0]['title'];
   String title2 = hotContents[1]['title'];
-  title2 = title2.replaceAll('â', '’');
+  print('title1 = $title1');
 
   List<String?> video1 = await fetchVideoId(title1);
+  print('video1 = $video1');
   List<String?> video2 = await fetchVideoId(title2);
+  print('video2 = $video2');
 
   String? video1_id = video1[0];
   String? video1_title = video1[1];
@@ -200,6 +205,8 @@ class A_Dance_Main extends StatelessWidget {
               String? video1_top_score = responseData?[5];
               String? video2_top_username = responseData?[6];
               String? video2_top_score = responseData?[7];
+
+              print('video1 = ${video1_top_username}');
 
               if (video1_id == null &&
                   video1_title == null &&
@@ -550,13 +557,26 @@ class A_Dance_Main extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(15),
                                   color: Colors.white,
                                 ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text('더보기'),
-                                    SizedBox(width: 30),
-                                    Icon(Icons.arrow_forward),
-                                  ],
+                                child: InkWell(
+                                  // GestureDetector 또는 InkWell 사용 가능
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              LeaderboardScreen(
+                                                title: 'Do You Know Dr.Hong?',
+                                              )), // 여기서 NewPage()는 새로운 위젯입니다.
+                                    );
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text('더보기'),
+                                      SizedBox(width: 30),
+                                      Icon(Icons.arrow_forward),
+                                    ],
+                                  ),
                                 ),
                               )
                             ],

@@ -12,8 +12,16 @@ import 'package:video_player/video_player.dart';
 class A_Dance_Film extends StatefulWidget {
   final String videoPath;
   final List<List<Offset>> allFramesKeypoints;
+  final String youtube_url;
+  final String title;
+  final String artist;
 
-  A_Dance_Film({required this.videoPath, required this.allFramesKeypoints});
+  A_Dance_Film(
+      {required this.videoPath,
+      required this.allFramesKeypoints,
+      required this.youtube_url,
+      required this.title,
+      required this.artist});
 
   @override
   _A_Dance_Film_State createState() => _A_Dance_Film_State();
@@ -110,6 +118,9 @@ class _A_Dance_Film_State extends State<A_Dance_Film> {
           MaterialPageRoute(
               builder: (context) => VideoPlaybackScreen(
                     videoPath: videoPath!,
+                    title: widget.title,
+                    artist: widget.artist,
+                    youtube_url: widget.youtube_url,
                   )));
     } catch (e) {
       print('Error in stopRecording: $e'); // 오류 로그
