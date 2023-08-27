@@ -15,7 +15,7 @@ Future<String> downloadVideo(String youtubeUrl) async {
   final Dio dio = Dio();
   final response = await dio.get(
     "$FileServerURL/download/", // url 변경 필요
-    queryParameters: {"url": youtubeUrl},
+    queryParameters: {"youtube_url": youtubeUrl},
     options: Options(
       responseType: ResponseType.bytes,
       followRedirects: false,

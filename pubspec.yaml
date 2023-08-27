@@ -46,6 +46,7 @@ dependencies:
   syncfusion_flutter_charts:
   dio:
   tuple:
+  flutter_ffmpeg: ^0.4.2d
   syncfusion_flutter_charts: ^19.3.44
   video_player: ^2.7.0
   video_thumbnail: ^0.5.3
