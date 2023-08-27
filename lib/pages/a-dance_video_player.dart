@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:a_dance/main.dart';
 import 'package:a_dance/pages/report.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:http/http.dart' as http;
 import 'package:tuple/tuple.dart';
@@ -15,12 +16,14 @@ class VideoPlaybackScreen extends StatefulWidget {
   final String youtube_url;
   final String title;
   final String artist;
+  final List<List<Offset>> allFramesKeypoints;
 
   VideoPlaybackScreen(
       {required this.videoPath,
       required this.youtube_url,
       required this.title,
-      required this.artist});
+      required this.artist,
+      required this.allFramesKeypoints});
 
   @override
   _VideoPlaybackScreenState createState() => _VideoPlaybackScreenState();
@@ -67,7 +70,18 @@ class _VideoPlaybackScreenState extends State<VideoPlaybackScreen> {
 
     var request = http.MultipartRequest(
         'POST', Uri.parse('$uploadServerURL/uploadvideo'));
-    request.files.add(await http.MultipartFile.fromPath('file', filePath));
+    // request.files.add(await http.MultipartFile.fromPath('file', filePath));
+
+    // 여기서부터 그냥 테스트용
+    final ByteData data = await rootBundle.load('assets/video1_30fps.mp4');
+    final List<int> bytes = data.buffer.asUint8List();
+    final Directory tempDir = Directory.systemTemp;
+    final String tempPath =
+        '${tempDir.path}/${'assets/video1_30fps.mp4'.split("/").last}';
+    final File tempFile = File(tempPath);
+    await tempFile.writeAsBytes(bytes, flush: true);
+    request.files.add(await http.MultipartFile.fromPath('file', tempPath));
+    // 테스트용 끝
 
     final response1 = await request.send();
 
@@ -223,6 +237,8 @@ class _VideoPlaybackScreenState extends State<VideoPlaybackScreen> {
                                 title: widget.title,
                                 score: response.item1,
                                 frame_score: response.item2,
+                                allFramesKeypoints: widget.allFramesKeypoints,
+                                videoPath: widget.videoPath,
                               )));
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(

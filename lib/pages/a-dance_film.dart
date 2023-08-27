@@ -121,6 +121,7 @@ class _A_Dance_Film_State extends State<A_Dance_Film> {
                     title: widget.title,
                     artist: widget.artist,
                     youtube_url: widget.youtube_url,
+                    allFramesKeypoints: allFramesKeypoints,
                   )));
     } catch (e) {
       print('Error in stopRecording: $e'); // 오류 로그

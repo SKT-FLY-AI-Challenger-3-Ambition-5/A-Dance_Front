@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:a_dance/main.dart';
+import 'package:a_dance/pages/a_dance_report.dart';
 import 'package:a_dance/pages/songleaderboard.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -30,8 +31,15 @@ class Report extends StatefulWidget {
   final String title;
   final double score;
   final List<double> frame_score;
+  final List<List<Offset>> allFramesKeypoints;
+  final String videoPath;
 
-  Report({required this.title, required this.score, required this.frame_score});
+  Report(
+      {required this.title,
+      required this.score,
+      required this.frame_score,
+      required this.allFramesKeypoints,
+      required this.videoPath});
 
   @override
   _ReportState createState() => _ReportState();
@@ -359,7 +367,20 @@ class _ReportState extends State<Report> {
                       ),
                       child: Center(
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => PersonalReport(
+                                          data: widget.frame_score,
+                                          title: widget.title,
+                                          score: score,
+                                          videoPath: widget.videoPath,
+                                          allFramesKeypoints:
+                                              widget.allFramesKeypoints,
+                                          frame_rank: frame_rank,
+                                        )));
+                          },
                           style: ElevatedButton.styleFrom(
                             primary: Color(0xFF3F3FFF),
                             shape: RoundedRectangleBorder(
