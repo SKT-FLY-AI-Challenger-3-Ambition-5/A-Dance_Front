@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:a_dance/main.dart';
+import 'package:a_dance/pages/result_analysis.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
+import 'package:video_player/video_player.dart';
 
 class PersonalReport extends StatefulWidget {
   final List<double> data;
@@ -16,6 +17,7 @@ class PersonalReport extends StatefulWidget {
   final List<String> frame_rank;
   final List<List<Offset>> allFramesKeypoints;
   final String videoPath;
+  final String username;
 
   PersonalReport(
       {required this.data,
@@ -23,7 +25,8 @@ class PersonalReport extends StatefulWidget {
       required this.score,
       required this.allFramesKeypoints,
       required this.videoPath,
-      required this.frame_rank});
+      required this.frame_rank,
+      required this.username});
 
   @override
   _PersonalReport createState() => _PersonalReport();
@@ -39,18 +42,6 @@ class _PersonalReport extends State<PersonalReport> {
       }
     }
     return result;
-  }
-
-  Future<String> captureImageFromVideo(
-      String videoPath, int startTimeInSeconds) async {
-    final FlutterFFmpeg _ffmpeg = FlutterFFmpeg();
-    final directory = await getTemporaryDirectory();
-    final String outputPath =
-        '${directory.path}/captured_frame_${DateTime.now().millisecondsSinceEpoch}.png';
-    final String command =
-        '-i $videoPath -ss 00:00:${startTimeInSeconds} -vframes 1 $outputPath';
-    await _ffmpeg.execute(command);
-    return outputPath;
   }
 
   Future<int> getAvgScore() async {
@@ -90,23 +81,25 @@ class _PersonalReport extends State<PersonalReport> {
   Widget build(BuildContext context) {
     List<int> badStartIndices = findBadStartingIndices(widget.frame_rank);
     print("Bad start indices: $badStartIndices");
+    double firstBadFrameTime = 0;
+    double secondBadFrameTime = 0;
 
-    final double firstBadFrameTime = badStartIndices[0] / 30;
-    final double secondBadFrameTime = badStartIndices[1] / 30;
-    final double thirdBadFrameTime = badStartIndices[2] / 30;
+    if (badStartIndices.length >= 2) {
+      firstBadFrameTime = badStartIndices[0] / 30;
+      secondBadFrameTime = badStartIndices[1] / 30;
+    }
+    print('firstBadFrameTiem = $firstBadFrameTime');
+    print('secondBadFrameTime = $secondBadFrameTime');
+
+    print('videoPath = ${widget.videoPath}');
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Color(0xFFE5E4EE), // 회색 배경
         body: FutureBuilder<List>(
             future: Future.wait([
               getAvgScore(),
-              captureImageFromVideo(
-                  widget.videoPath, firstBadFrameTime.round().toInt()),
-              captureImageFromVideo(
-                  widget.videoPath, secondBadFrameTime.round().toInt()),
-              captureImageFromVideo(
-                  widget.videoPath, thirdBadFrameTime.round().toInt())
             ]),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -118,7 +111,6 @@ class _PersonalReport extends State<PersonalReport> {
                   child: Column(
                     children: [
                       SizedBox(height: 50), // Size Box 높이
-
                       // 흰색 컨테이너
                       Container(
                         height: 2200,
@@ -150,12 +142,7 @@ class _PersonalReport extends State<PersonalReport> {
                                 IconButton(
                                   icon: Icon(Icons.arrow_back_ios_new_rounded),
                                   onPressed: () {
-                                    // Navigator.pushAndRemoveUntil(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //         builder: (BuildContext context) =>
-                                    //             Adot_Main()),
-                                    //     (route) => false);
+                                    Navigator.pop(context);
                                   },
                                 ),
                                 SizedBox(
@@ -208,7 +195,7 @@ class _PersonalReport extends State<PersonalReport> {
                               TextSpan(
                                 children: [
                                   TextSpan(
-                                    text: '사용자 닉네임',
+                                    text: '${widget.username}',
                                     style: TextStyle(
                                       color: Color(0xFF9EA3B1),
                                       fontSize: 28,
@@ -317,7 +304,7 @@ class _PersonalReport extends State<PersonalReport> {
                                             )),
                                         lineBarsData: [
                                           LineChartBarData(
-                                            spots: List.generate(10, (index) {
+                                            spots: List.generate(dldl, (index) {
                                               return FlSpot(index.toDouble(),
                                                   widget.data[index]);
                                             }),
@@ -357,7 +344,6 @@ class _PersonalReport extends State<PersonalReport> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  //평균 정확도
                                   Container(
                                     width: 300,
                                     height: 125,
@@ -390,7 +376,7 @@ class _PersonalReport extends State<PersonalReport> {
                                           ),
                                           SizedBox(width: 5), // 아이콘과 텍스트 간격
                                           Text(
-                                            '평균 정확도',
+                                            '평균 대비 내 점수',
                                             style: TextStyle(
                                               color: Color(0xFFA0AEC0),
                                               fontSize: 12,
@@ -499,7 +485,7 @@ class _PersonalReport extends State<PersonalReport> {
                             SizedBox(height: 30),
                             //정확도 결과 컨테이너
                             Container(
-                              height: 1460,
+                              height: 850,
                               decoration: BoxDecoration(
                                 color: Color(0xFF5252FF),
                                 borderRadius: BorderRadius.only(
@@ -523,7 +509,7 @@ class _PersonalReport extends State<PersonalReport> {
                                     height: 45,
                                   ),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(
                                         CupertinoIcons.sparkles,
@@ -596,15 +582,12 @@ class _PersonalReport extends State<PersonalReport> {
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
                                                 children: [
-                                                  // SizedBox(
-                                                  //   width: 100,
-                                                  // ),
                                                   Icon(
                                                       CupertinoIcons
                                                           .hand_point_right_fill,
                                                       color: Colors.amber),
                                                   Text(
-                                                    " ${firstBadFrameTime.toStringAsFixed(2)} ~ ${(firstBadFrameTime + 3).toStringAsFixed(2)}",
+                                                    " ${firstBadFrameTime.toStringAsFixed(2)}초 ~ ${(firstBadFrameTime + 1).toStringAsFixed(2)}초",
                                                     style: TextStyle(
                                                         fontFamily: 'Inter',
                                                         fontWeight:
@@ -625,7 +608,20 @@ class _PersonalReport extends State<PersonalReport> {
                                   ),
                                   SizedBox(height: 20.0),
                                   ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Result_Analysis(
+                                            videoPath: widget.videoPath,
+                                            allFramesKeypoints:
+                                                widget.allFramesKeypoints,
+                                            badFrametime: firstBadFrameTime,
+                                            badStart: badStartIndices[0],
+                                          ),
+                                        ),
+                                      );
+                                    },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor:
                                           Color.fromRGBO(255, 255, 255, 20),
@@ -640,15 +636,14 @@ class _PersonalReport extends State<PersonalReport> {
                                     ),
                                     child: Row(
                                       children: [
-                                        Image.file(
-                                          File(snapshot.data![1]),
-                                          width: 100,
-                                          height: 190,
-                                        ),
-                                        SizedBox(width: 30),
+                                        VideoFramePreview(
+                                            videoPath: widget.videoPath,
+                                            time: firstBadFrameTime
+                                                .round()
+                                                .toInt()),
                                         SizedBox(
-                                          width: 150,
-                                          height: 70,
+                                          width: 100,
+                                          height: 100,
                                           child: Text(
                                             '음악과 박자를 맞추어 보세요!',
                                             style: TextStyle(
@@ -696,34 +691,35 @@ class _PersonalReport extends State<PersonalReport> {
                                               borderRadius:
                                                   BorderRadius.circular(20.0),
                                             ),
-                                            child: Container(
-                                              constraints: BoxConstraints(
-                                                  minWidth: 160, minHeight: 48),
-                                              alignment: Alignment.center,
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  // SizedBox(
-                                                  //   width: 100,
-                                                  // ),
-                                                  Icon(
-                                                      CupertinoIcons
-                                                          .hand_point_right_fill,
-                                                      color: Colors.amber),
-                                                  Text(
-                                                    " ${secondBadFrameTime.toStringAsFixed(2)} ~ ${(secondBadFrameTime + 3).toStringAsFixed(2)}",
-                                                    style: TextStyle(
-                                                        fontFamily: 'Inter',
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                        fontSize: 24,
-                                                        color: Colors.black),
-                                                  ),
-                                                  // SizedBox(
-                                                  //   width: 100,
-                                                  // ),
-                                                ],
+                                            child: GestureDetector(
+                                              onTap: () {},
+                                              child: Container(
+                                                constraints: BoxConstraints(
+                                                    minWidth: 160,
+                                                    minHeight: 48),
+                                                alignment: Alignment.center,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                        CupertinoIcons
+                                                            .hand_point_right_fill,
+                                                        color: Colors.amber),
+                                                    Text(
+                                                      " ${secondBadFrameTime.toStringAsFixed(2)}초 ~ ${(secondBadFrameTime + 1).toStringAsFixed(2)}초",
+                                                      style: TextStyle(
+                                                          fontFamily: 'Inter',
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                          fontSize: 24,
+                                                          color: Colors.black),
+                                                    ),
+                                                    // SizedBox(
+                                                    //   width: 100,
+                                                    // ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -733,7 +729,20 @@ class _PersonalReport extends State<PersonalReport> {
                                   ),
                                   SizedBox(height: 20.0),
                                   ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Result_Analysis(
+                                            videoPath: widget.videoPath,
+                                            allFramesKeypoints:
+                                                widget.allFramesKeypoints,
+                                            badFrametime: secondBadFrameTime,
+                                            badStart: badStartIndices[1],
+                                          ),
+                                        ),
+                                      );
+                                    },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor:
                                           Color.fromRGBO(255, 255, 255, 20),
@@ -747,17 +756,16 @@ class _PersonalReport extends State<PersonalReport> {
                                     ),
                                     child: Row(
                                       children: [
-                                        Image.file(
-                                          File(snapshot.data![2]),
-                                          width: 100,
-                                          height: 190,
-                                        ),
-                                        SizedBox(width: 30),
+                                        VideoFramePreview(
+                                            videoPath: widget.videoPath,
+                                            time: secondBadFrameTime
+                                                .round()
+                                                .toInt()),
                                         SizedBox(
-                                          width: 150,
+                                          width: 100,
                                           // height: 70,
                                           child: Text(
-                                            '왼팔의 움직임에 조금 더 주의를 기울여 보세요!',
+                                            '움직임에 조금 더 주의를 기울여 보세요!',
                                             style: TextStyle(
                                               color: Colors.black,
                                               fontSize: 20,
@@ -772,107 +780,7 @@ class _PersonalReport extends State<PersonalReport> {
                                   SizedBox(
                                     height: 30,
                                   ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton(
-                                        onPressed: () {},
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.white70,
-                                          shadowColor: Colors.transparent,
-                                          elevation: 10, // 그림자의 깊이 조절
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 10),
-                                        ),
-                                        child: Ink(
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              begin: Alignment(0.00, -1.00),
-                                              end: Alignment(0, 1),
-                                              colors: [
-                                                Color(0xFFCFCFFB),
-                                                Color(0xFFE7E7FF)
-                                              ],
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(20.0),
-                                          ),
-                                          child: Container(
-                                            constraints: BoxConstraints(
-                                                minWidth: 160, minHeight: 48),
-                                            alignment: Alignment.center,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                SizedBox(
-                                                  width: 100,
-                                                ),
-                                                Icon(
-                                                    CupertinoIcons
-                                                        .hand_point_right_fill,
-                                                    color: Colors.amber),
-                                                Text(
-                                                  " ${thirdBadFrameTime.toStringAsFixed(2)} ~ ${(thirdBadFrameTime + 3).toStringAsFixed(2)}",
-                                                  style: TextStyle(
-                                                      fontFamily: 'Inter',
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      fontSize: 24,
-                                                      color: Colors.black),
-                                                ),
-                                                SizedBox(
-                                                  width: 100,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
                                   SizedBox(height: 20.0),
-                                  ElevatedButton(
-                                    onPressed: () {},
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                          Color.fromRGBO(255, 255, 255, 20),
-                                      shadowColor: Colors.transparent,
-                                      elevation: 10, // 그림자의 깊이 조절
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(50),
-                                      ),
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 50, horizontal: 40),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Image.file(
-                                          File(snapshot.data![2]),
-                                          width: 100,
-                                          height: 190,
-                                        ),
-                                        SizedBox(width: 30),
-                                        SizedBox(
-                                          width: 150,
-                                          // height: 70,
-                                          child: Text(
-                                            '다리의 움직임에 조금 더 주의를 기울여 보세요!',
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 20,
-                                              fontFamily: 'Inter',
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),
@@ -919,5 +827,58 @@ class _PersonalReport extends State<PersonalReport> {
             }),
       ),
     );
+  }
+}
+
+class VideoFramePreview extends StatefulWidget {
+  final String videoPath;
+  final int time;
+
+  VideoFramePreview({required this.videoPath, required this.time});
+
+  @override
+  _VideoFramePreviewState createState() => _VideoFramePreviewState();
+}
+
+class _VideoFramePreviewState extends State<VideoFramePreview> {
+  VideoPlayerController? _controller;
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.file(File(widget.videoPath))
+      ..initialize().then((_) {
+        // Ensure the first frame is shown and set state to refresh the widget
+        setState(() {
+          _controller?.seekTo(Duration(seconds: widget.time));
+          _initialized = true;
+        });
+      });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _initialized
+        ? Transform.rotate(
+            angle: -pi / 2, // 반시계방향으로 90도 회전
+            child: Container(
+              width: 180,
+              height: 100,
+              child: VideoPlayer(_controller!),
+            ),
+          )
+        : Container(
+            width: 180,
+            height: 100,
+            color: Colors.grey[300], // 초기화되기 전에는 회색으로 표시됩니다.
+            child: Center(child: CircularProgressIndicator()), // 로딩 표시
+          );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller?.dispose();
   }
 }

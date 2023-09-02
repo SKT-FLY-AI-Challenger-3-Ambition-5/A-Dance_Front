@@ -303,7 +303,7 @@ class A_Dance_Main extends StatelessWidget {
                                       height: 3,
                                     ),
                                     Text(
-                                      '   98.9',
+                                      '   81',
                                       style: TextStyle(
                                         color: Colors.black87,
                                         fontSize: 26,
@@ -341,7 +341,7 @@ class A_Dance_Main extends StatelessWidget {
                                       ],
                                     ),
                                     SizedBox(
-                                      height: 28,
+                                      height: 20,
                                     ),
                                     ElevatedButton(
                                       onPressed: () {

@@ -145,7 +145,7 @@ class Main1 extends StatelessWidget {
                             child: Container(
                               alignment: Alignment.centerLeft,
                               child: Image.asset(
-                                'images/logo2.png', // 이미지 파일 경로
+                                'assets/logo.png', // 이미지 파일 경로
                                 width: 70, // 이미지의 가로 크기
                                 height: 70, // 이미지의 세로 크기
                                 // 이미지 컬러

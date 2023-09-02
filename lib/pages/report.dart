@@ -33,13 +33,15 @@ class Report extends StatefulWidget {
   final List<double> frame_score;
   final List<List<Offset>> allFramesKeypoints;
   final String videoPath;
+  final String username;
 
   Report(
       {required this.title,
       required this.score,
       required this.frame_score,
       required this.allFramesKeypoints,
-      required this.videoPath});
+      required this.videoPath,
+      required this.username});
 
   @override
   _ReportState createState() => _ReportState();
@@ -56,7 +58,7 @@ class _ReportState extends State<Report> {
     List<LeaderboardItem> fetchedItems = [];
     print('title = ${widget.title}');
     final Uri url = Uri.parse('$URL/api/get_leaderboard');
-    final Map<String, dynamic> requestBody = {"title": widget.title, "num": 3};
+    final Map<String, dynamic> requestBody = {"title": widget.title, "num": 5};
     final List<String> imagePaths = [
       'assets/rabbit.png',
       'assets/boy.png',
@@ -98,7 +100,7 @@ class _ReportState extends State<Report> {
   Color getColor(String rank) {
     switch (rank) {
       case 'Bad':
-        return Colors.red;
+        return Colors.pink;
       case 'Good':
         return Colors.yellow;
       case 'Great':
@@ -113,11 +115,11 @@ class _ReportState extends State<Report> {
     super.initState();
     score = widget.score.round().toInt();
     frame_rank = widget.frame_score.map((score) {
-      if (score >= 0 && score < 30) {
+      if (score >= 0 && score < 50) {
         return 'Bad';
-      } else if (score >= 30 && score < 60) {
+      } else if (score >= 50 && score < 70) {
         return 'Good';
-      } else if (score >= 60 && score <= 100) {
+      } else if (score >= 70 && score <= 100) {
         return 'Great';
       } else {
         return 'Unknown'; // 이 경우는 score 값이 주어진 범위 외의 값인 경우를 위한 것입니다.
@@ -192,7 +194,7 @@ class _ReportState extends State<Report> {
                               alignment: Alignment.center,
                               children: [
                                 SizedBox(
-                                  height: 310,
+                                  height: 290,
                                   width: 310,
                                   child: SfCircularChart(
                                     series: <CircularSeries>[
@@ -234,7 +236,7 @@ class _ReportState extends State<Report> {
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
-                                    '전체 사용자 중 0위에요',
+                                    '와우! 대단한 실력인데요~',
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold),
@@ -379,6 +381,7 @@ class _ReportState extends State<Report> {
                                           allFramesKeypoints:
                                               widget.allFramesKeypoints,
                                           frame_rank: frame_rank,
+                                          username: widget.username,
                                         )));
                           },
                           style: ElevatedButton.styleFrom(

@@ -1,10 +1,12 @@
 import 'package:a_dance/pages/adot_main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-const URL = 'http://64.176.224.69:8000';
+const URL = 'http://158.247.217.16:8000';
 const FileServerURL = 'http://158.247.194.70:8080';
-const uploadServerURL = 'http://158.247.212.49:8003';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   runApp(Adot_Main());
 }

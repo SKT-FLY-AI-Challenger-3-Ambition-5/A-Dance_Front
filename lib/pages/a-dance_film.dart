@@ -52,7 +52,6 @@ class _A_Dance_Film_State extends State<A_Dance_Film> {
       });
     allFramesKeypoints = widget.allFramesKeypoints;
     updateFrame();
-    currentFrameIndex = 0;
   }
 
   void updateFrame() {

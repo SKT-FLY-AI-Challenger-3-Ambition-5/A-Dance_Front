@@ -5,7 +5,6 @@ import 'dart:math';
 import 'package:a_dance/main.dart';
 import 'package:a_dance/pages/report.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:http/http.dart' as http;
 import 'package:tuple/tuple.dart';
@@ -66,65 +65,47 @@ class _VideoPlaybackScreenState extends State<VideoPlaybackScreen> {
       isLoading = true;
     });
 
-    String serverFilePath = '';
+    var request = http.MultipartRequest('POST', Uri.parse('$URL/api/scoring'));
 
-    var request = http.MultipartRequest(
-        'POST', Uri.parse('$uploadServerURL/uploadvideo'));
-    // request.files.add(await http.MultipartFile.fromPath('file', filePath));
+    final jsonData =
+        '{"youtube_url": "$youtube_url", "title": "$title", "artist": "$artist", "username": "$username"}';
 
-    // 여기서부터 그냥 테스트용
-    final ByteData data = await rootBundle.load('assets/video1_30fps.mp4');
-    final List<int> bytes = data.buffer.asUint8List();
-    final Directory tempDir = Directory.systemTemp;
-    final String tempPath =
-        '${tempDir.path}/${'assets/video1_30fps.mp4'.split("/").last}';
-    final File tempFile = File(tempPath);
-    await tempFile.writeAsBytes(bytes, flush: true);
-    request.files.add(await http.MultipartFile.fromPath('file', tempPath));
-    // 테스트용 끝
+    request.fields['data'] = jsonData;
+
+    // 실배포용 비디오는 이거 써야함
+    request.files.add(await http.MultipartFile.fromPath('file', filePath));
+
+    // // 비디오 테스트용
+    // // final ByteData data = await rootBundle.load('assets/rev_hong.mp4');
+    // final ByteData data = await rootBundle.load('assets/video1_30fps.mp4');
+    // final List<int> bytes = data.buffer.asUint8List();
+    // final Directory tempDir = Directory.systemTemp;
+    // // final String tempPath =
+    // //     '${tempDir.path}/${'assets/rev_hong.mp4'.split("/").last}';
+    // final String tempPath =
+    //     '${tempDir.path}/${'assets/video1_30fps.mp4'.split("/").last}';
+    // final File tempFile = File(tempPath);
+    // await tempFile.writeAsBytes(bytes, flush: true);
+    // request.files.add(await http.MultipartFile.fromPath('file', tempPath));
+    // // 테스트용 끝
+
+    print('scoring request json = ${jsonData}');
 
     final response1 = await request.send();
 
     print('response1 statusCode = ${response1.statusCode}');
-    if (response1.statusCode == 200) {
-      String responseBody = await response1.stream.bytesToString();
-      Map<String, dynamic> responseData =
-          jsonDecode(responseBody); // JSON 응답을 파싱
-      print('responseBody = $responseBody');
-      print('responseData = $responseData');
-      serverFilePath = responseData['filepath'];
-    }
-
-    final url = '$URL/api/scoring'; // 여기에 실제 서버의 URL을 입력해주세요.
-    final headers = {"Content-type": "application/json"};
-    final jsonData = {
-      "youtube_url": youtube_url,
-      "title": title,
-      "artist": artist,
-      "username": username,
-      "filepath": serverFilePath
-    };
-
-    print('scoring request json = $jsonData');
-
-    final response2 = await http.post(
-      Uri.parse(url),
-      headers: headers,
-      body: json.encode(jsonData),
-    );
-
-    print('response2 statusCode = ${response2.statusCode}');
 
     setState(() {
       isLoading = false;
     });
 
-    if (response2.statusCode == 200) {
-      final responseData2 = jsonDecode(response2.body);
-      final double oks_30 = responseData2['oks_30'];
-      final List<double> oks_frame_score =
-          List<double>.from(responseData2['oks_frame_score']);
-      return Tuple2(oks_30, oks_frame_score);
+    if (response1.statusCode == 200) {
+      final response = await http.Response.fromStream(response1);
+      final responseData = jsonDecode(response.body);
+      final double pck_30 = responseData['pck_30'];
+      final List<double> pck_frame_score =
+          List<double>.from(responseData['pck_frame_score']);
+      return Tuple2(pck_30, pck_frame_score);
     }
 
     return Tuple2(0, [0]);
@@ -173,7 +154,23 @@ class _VideoPlaybackScreenState extends State<VideoPlaybackScreen> {
               color: Colors.black.withOpacity(0.5),
             ),
             Center(
-              child: CircularProgressIndicator(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'images/adot-char.gif',
+                    height: 120,
+                  ),
+                  Text(
+                    '     채점 중이에요!\n잠시만 기다려 주세요!',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
             )
           ]
         ],
@@ -239,6 +236,7 @@ class _VideoPlaybackScreenState extends State<VideoPlaybackScreen> {
                                 frame_score: response.item2,
                                 allFramesKeypoints: widget.allFramesKeypoints,
                                 videoPath: widget.videoPath,
+                                username: userName,
                               )));
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
