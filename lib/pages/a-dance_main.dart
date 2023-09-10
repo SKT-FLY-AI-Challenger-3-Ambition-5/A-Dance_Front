@@ -1,32 +1,36 @@
 import 'dart:convert';
 
+import 'package:a_dance/main.dart';
 import 'package:a_dance/pages/a-dance_mypage.dart';
 import 'package:a_dance/pages/a-dance_youtube.dart';
 import 'package:a_dance/pages/adot_main.dart';
+import 'package:a_dance/pages/songleaderboard.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-Future<String> fetchData(String url_str) async {
+Future<String?> fetchData(String url_str) async {
   final url = Uri.parse(url_str);
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
     return response.body;
   } else {
-    throw Exception('Failed to load data');
+    return null; // Return null if the request failed
   }
 }
 
 Future<List<String?>> fetchVideoId(String searchTerm) async {
   final url = Uri.parse(
-      'https://www.googleapis.com/youtube/v3/search?part=snippet&q=$searchTerm&key=AIzaSyAYjK0kwHzzH7pUsfKViLQpmwaJwAGeJKo&type=video&maxResults=1');
+      'https://www.googleapis.com/youtube/v3/search?part=snippet&q=$searchTerm&key=AIzaSyDgkHTDhrsOczTCQMsNRfG9JZKQQI01gRI&type=video&maxResults=1');
+  print('url = $url');
 
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
     var data = jsonDecode(response.body);
+    print('data = $data');
     if (data['items'].isNotEmpty) {
       return [
         data['items'][0]['id']['videoId'],
@@ -35,19 +39,82 @@ Future<List<String?>> fetchVideoId(String searchTerm) async {
     }
   }
 
-  return [null];
+  return [
+    null,
+    null
+  ]; // Return two null values if the request failed or data['items'] is empty
 }
 
-Future<List<dynamic>> fetchMulti(String url_str) async {
-  String Data = await fetchData(url_str);
+Future<List<String?>> getScore(String title) async {
+  try {
+    final url = '$URL/api/get_leaderboard'; // Set your URL
+    final headers = {
+      'Content-Type': 'application/json',
+    };
 
-  List<dynamic> hotContents = jsonDecode(Data!)['hot_contents'];
+    final body = jsonEncode({
+      'title': title,
+      'num': 1,
+    });
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      final leaderboard = responseData['leaderboard'];
+      if (leaderboard != null && leaderboard.isNotEmpty) {
+        final username = leaderboard[0]['username'];
+        final score = leaderboard[0]['score'];
+        return [username, score.toString()]; // Convert score to string
+      }
+      print('Error: Empty leaderboard');
+      return [
+        'User1',
+        '80'
+      ]; // Return an error message in the list if leaderboard is empty
+    } else {
+      print('Error: HTTP ${response.statusCode}');
+      return [
+        'User1',
+        '80'
+      ]; // Return an error message in the list for non-200 responses
+    }
+  } catch (e) {
+    print('Error fetching score: $e');
+    return [
+      'User1',
+      '80'
+    ]; // Return an error message in the list for exceptions
+  }
+}
+
+Future<List<String?>> fetchMulti(String url_str) async {
+  String? Data = await fetchData(url_str);
+
+  if (Data == null) {
+    return [
+      null,
+      null,
+      null,
+      null
+    ]; // Return four null values if the request failed
+  }
+
+  List<dynamic> hotContents = jsonDecode(Data)['hot_contents'];
+  print('hotContents = $hotContents');
 
   String title1 = hotContents[0]['title'];
   String title2 = hotContents[1]['title'];
+  print('title1 = $title1');
 
   List<String?> video1 = await fetchVideoId(title1);
+  print('video1 = $video1');
   List<String?> video2 = await fetchVideoId(title2);
+  print('video2 = $video2');
 
   String? video1_id = video1[0];
   String? video1_title = video1[1];
@@ -55,7 +122,25 @@ Future<List<dynamic>> fetchMulti(String url_str) async {
   String? video2_id = video2[0];
   String? video2_title = video2[1];
 
-  return [video1_id, video1_title, video2_id, video2_title]; // 두 결과값을 리스트로 반환
+  List<String?> video1_top = await getScore(title1);
+  List<String?> video2_top = await getScore(title2);
+
+  String? video1_top_username = video1_top[0];
+  String? video1_top_score = video1_top[1];
+
+  String? video2_top_username = video2_top[0];
+  String? video2_top_score = video2_top[1];
+
+  return [
+    video1_id,
+    video1_title,
+    video2_id,
+    video2_title,
+    video1_top_username,
+    video1_top_score,
+    video2_top_username,
+    video2_top_score
+  ]; // Return the results as a list
 }
 
 class A_Dance_Main extends StatelessWidget {
@@ -66,9 +151,22 @@ class A_Dance_Main extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xFFE5E4EE),
       appBar: AppBar(
-        title: Text('에이단ㅡ스'),
+        backgroundColor: Colors.white,
+        title: Text(
+          '에이단ㅡ스',
+          style: TextStyle(
+            fontSize: 18,
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
+        centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.black,
+          ),
           onPressed: () {
             Navigator.pushAndRemoveUntil(
                 context,
@@ -77,33 +175,51 @@ class A_Dance_Main extends StatelessWidget {
                 (route) => false);
           },
         ),
+        toolbarHeight: 60.0,
       ),
       body: FutureBuilder<List<dynamic>>(
-          future:
-              fetchMulti('http://141.164.39.68:8000/api/get_hot_contents/2'),
+          future: fetchMulti('$URL/api/get_hot_contents/2'),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               // 데이터가 아직 로드되지 않았을 때 로딩 인디케이터 표시
               return Center(
                 child: CircularProgressIndicator(),
               );
-            } else if (snapshot.hasError) {
-              // 에러 발생 시 에러 메시지 표시
-              return Text('Error: ${snapshot.error}');
             } else {
               // 데이터 로드 완료. 이곳에서 응답 데이터를 사용하여 위젯을 렌더링.
               final responseData = snapshot.data;
 
               String? video1_id = responseData?[0];
               String? video1_title = responseData?[1];
-              if (video1_title!.length > 20) {
+              if (video1_title != null && video1_title!.length > 20) {
                 video1_title = video1_title.substring(0, 17) + "...";
               }
 
               String? video2_id = responseData?[2];
               String? video2_title = responseData?[3];
-              if (video2_title!.length > 20) {
+              if (video2_title != null && video2_title!.length > 20) {
                 video2_title = video2_title.substring(0, 17) + "...";
+              }
+
+              String? video1_top_username = responseData?[4];
+              String? video1_top_score = responseData?[5];
+              String? video2_top_username = responseData?[6];
+              String? video2_top_score = responseData?[7];
+
+              print('video1 = ${video1_top_username}');
+
+              if (video1_id == null &&
+                  video1_title == null &&
+                  video2_id == null &&
+                  video2_title == null &&
+                  video1_top_username == null &&
+                  video1_top_score == null &&
+                  video2_top_username == null &&
+                  video2_top_score == null) {
+                video1_id = 'VOC83aZy_NI';
+                video1_title = '로딩 실패';
+                video2_id = 'VOC83aZy_NI';
+                video2_title = '로딩 실패';
               }
 
               return SingleChildScrollView(
@@ -119,7 +235,7 @@ class A_Dance_Main extends StatelessWidget {
                           borderRadius: BorderRadius.circular(15),
                           color: Colors.white,
                         ),
-                        height: 250,
+                        height: 270,
                         child: Row(
                           children: [
                             SizedBox(
@@ -136,6 +252,7 @@ class A_Dance_Main extends StatelessWidget {
                                     image: AssetImage('images/adot-char2.gif'),
                                     height: 180,
                                   ),
+                                  SizedBox(height: 10),
                                   ElevatedButton(
                                     onPressed: () {
                                       Navigator.push(
@@ -145,12 +262,19 @@ class A_Dance_Main extends StatelessWidget {
                                                   WebViewApp()));
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blue,
+                                      backgroundColor: Color(0xFF3F3FFF),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            20), // 버튼 모서리를 둥글게 만듦
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 12, horizontal: 20),
                                     ),
                                     child: const Text(
-                                      '연습하러가기',
+                                      ' 연습하러가기 ',
                                       style: TextStyle(
-                                        fontSize: 10,
+                                        fontSize: 15,
+                                        fontFamily: 'Inter',
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
@@ -171,13 +295,20 @@ class A_Dance_Main extends StatelessWidget {
                                       '내 최고 점수',
                                       style: TextStyle(
                                         fontSize: 18,
+                                        fontFamily: 'Inter',
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
+                                    SizedBox(
+                                      height: 3,
+                                    ),
                                     Text(
-                                      '999',
+                                      '   81',
                                       style: TextStyle(
-                                        fontSize: 18,
+                                        color: Colors.black87,
+                                        fontSize: 26,
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.w700,
                                       ),
                                     ),
                                     SizedBox(
@@ -186,12 +317,12 @@ class A_Dance_Main extends StatelessWidget {
                                     Text(
                                       '최근 플레이 곡',
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 17,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     SizedBox(
-                                      height: 20,
+                                      height: 18,
                                     ),
                                     Row(
                                       children: [
@@ -201,12 +332,12 @@ class A_Dance_Main extends StatelessWidget {
                                           width: 10,
                                         ),
                                         RecentPlayedSong(
-                                            img: 'images/new_jeans.png'),
+                                            img: 'images/aespa.jpeg'),
                                         SizedBox(
                                           width: 10,
                                         ),
                                         RecentPlayedSong(
-                                            img: 'images/new_jeans.png'),
+                                            img: 'images/lesserafim.jpeg'),
                                       ],
                                     ),
                                     SizedBox(
@@ -222,12 +353,19 @@ class A_Dance_Main extends StatelessWidget {
                                         );
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.blue,
+                                        backgroundColor: Color(0xFF3F3FFF),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              20), // 버튼 모서리를 둥글게 만듦
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 12, horizontal: 20),
                                       ),
                                       child: const Text(
                                         '마이 페이지로 이동',
                                         style: TextStyle(
-                                          fontSize: 10,
+                                          fontSize: 15,
+                                          fontFamily: 'Inter',
                                           fontWeight: FontWeight.bold,
                                           color: Colors.white,
                                         ),
@@ -305,7 +443,7 @@ class A_Dance_Main extends StatelessWidget {
                                             controller: YoutubePlayerController(
                                               initialVideoId: '$video1_id',
                                               flags: const YoutubePlayerFlags(
-                                                autoPlay: true,
+                                                autoPlay: false,
                                                 mute: true,
                                                 hideControls: true,
                                               ),
@@ -395,30 +533,14 @@ class A_Dance_Main extends StatelessWidget {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      LeaderBoardCell(img: 'images/char1.png'),
-                                      LeaderBoardCell(img: 'images/char3.png'),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      LeaderBoardCell(img: 'images/char3.png'),
-                                      LeaderBoardCell(img: 'images/char1.png'),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      LeaderBoardCell(img: 'images/char1.png'),
-                                      LeaderBoardCell(img: 'images/char3.png'),
+                                      LeaderBoardCell(
+                                          img: 'images/char1.png',
+                                          username: video1_top_username,
+                                          score: video1_top_score),
+                                      LeaderBoardCell(
+                                          img: 'images/char3.png',
+                                          username: video2_top_username,
+                                          score: video2_top_score),
                                     ],
                                   ),
                                   SizedBox(
@@ -435,13 +557,26 @@ class A_Dance_Main extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(15),
                                   color: Colors.white,
                                 ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text('더보기'),
-                                    SizedBox(width: 30),
-                                    Icon(Icons.arrow_forward),
-                                  ],
+                                child: InkWell(
+                                  // GestureDetector 또는 InkWell 사용 가능
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              LeaderboardScreen(
+                                                title: 'Do You Know Dr.Hong?',
+                                              )), // 여기서 NewPage()는 새로운 위젯입니다.
+                                    );
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text('더보기'),
+                                      SizedBox(width: 30),
+                                      Icon(Icons.arrow_forward),
+                                    ],
+                                  ),
                                 ),
                               )
                             ],
@@ -482,10 +617,14 @@ class RecentPlayedSong extends StatelessWidget {
 
 class LeaderBoardCell extends StatelessWidget {
   final String img;
+  final String? username;
+  final String? score;
 
   const LeaderBoardCell({
     super.key,
     required this.img,
+    required this.username,
+    required this.score,
   });
 
   @override
@@ -513,21 +652,26 @@ class LeaderBoardCell extends StatelessWidget {
                     height: 80,
                   ),
                   SizedBox(
-                    width: 10,
+                    width: 30,
                   ),
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text('최고 점수'),
+                      Text('$username'),
                       Text(
-                        '938',
+                        '최고 점수',
                         style: TextStyle(
-                          fontSize: 13,
+                          fontFamily: 'Inter',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       Text(
-                        '최근 플레이 곡',
+                        '$score',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 13,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],

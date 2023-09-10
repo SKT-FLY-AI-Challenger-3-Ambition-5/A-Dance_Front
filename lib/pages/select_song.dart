@@ -1,30 +1,86 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:a_dance/main.dart';
 import 'package:a_dance/pages/a-dance_film.dart';
 import 'package:a_dance/pages/a-dance_main.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
-Future<String> downloadVideo(String videoId) async {
-  final yt = YoutubeExplode();
-  final manifest = await yt.videos.streamsClient.getManifest(videoId);
-  // final streamInfo = manifest.muxed.withHighestBitrate();
-  final streamInfo = manifest.muxed.last;
+Future<String> downloadVideo(String youtubeUrl) async {
+  final Dio dio = Dio();
+  final response = await dio.get(
+    "$FileServerURL/download/", // url 변경 필요
+    queryParameters: {"youtube_url": youtubeUrl},
+    options: Options(
+      responseType: ResponseType.bytes,
+      followRedirects: false,
+      validateStatus: (status) {
+        return status! < 500;
+      },
+    ),
+  );
 
-  var stream = yt.videos.streamsClient.get(streamInfo);
   final directory = await getTemporaryDirectory();
-
   final file = File('${directory.path}/downloaded.mp4');
-  final fileStream = file.openWrite();
-
-  await stream.pipe(fileStream); // 다운로드 및 파일에 저장
-  fileStream.close();
-  yt.close();
+  await file.writeAsBytes(response.data); // response.data가 여러개 올 예정
 
   print('file\'s path = ${file.path}');
-  return file.path;
+  return file
+      .path; // return 값에 file.path, song_info.title, song_info.artist 포함 예정
+}
+
+Future<Map<String, dynamic>> fetchDetails(String youtubeUrl) async {
+  final response = await http.post(
+    Uri.parse('$URL/api/user_request_download_youtube'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      'youtube_url': youtubeUrl,
+    }),
+  );
+
+  print('response.statusCode = ${response.statusCode}');
+  if (response.statusCode == 200) {
+    Map<String, dynamic> responseData = jsonDecode(response.body);
+
+    String title = responseData['title'];
+    String artist = responseData['artist'];
+    String youtube_url = responseData['h_youtube_url'];
+    List<dynamic> keypoints_tmp = responseData['keypoints'];
+
+    // print('title = $title');
+    // print('artist = $artist');
+    // print('youtube_url = $youtube_url');
+    // print('keypoints = $keypoints_tmp');
+
+    return {
+      'title': title,
+      'artist': artist,
+      'youtube_url': youtube_url,
+      'keypoints': keypoints_tmp
+    };
+  } else {
+    throw Exception('Failed to load details');
+  }
+}
+
+List<List<Offset>> decodeKeypoints(List<dynamic> keypoints_tmp) {
+  List<dynamic> framesData = keypoints_tmp;
+  return framesData
+      .map((frameData) {
+        return frameData
+            .map((point) => Offset(point[0], point[1]))
+            .toList()
+            .cast<Offset>();
+      })
+      .toList()
+      .cast<List<Offset>>();
 }
 
 class Select_Song extends StatefulWidget {
@@ -37,8 +93,10 @@ class _Select_SongState extends State<Select_Song> {
   String inputText = '';
   String artist = "아티스트";
   String title = "제목";
+  String youtube_url = '';
   bool isLoading = false;
   String filepath = '';
+  late List<List<Offset>> allFramesKeypoints;
 
   @override
   void initState() {
@@ -62,6 +120,7 @@ class _Select_SongState extends State<Select_Song> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: const Color(0xFFE5E4EE),
         appBar: AppBar(
@@ -75,12 +134,12 @@ class _Select_SongState extends State<Select_Song> {
           automaticallyImplyLeading: true,
           leading: BackButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => A_Dance_Main(),
-                ),
-              );
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => A_Dance_Main(),
+                  ),
+                  (route) => false);
             },
           ),
         ),
@@ -118,18 +177,51 @@ class _Select_SongState extends State<Select_Song> {
                             r'(?:youtube\.com/watch\?v=|youtu\.be/|youtube\.com/shorts/)([^&?]+)');
                         Match? match = regExp.firstMatch(myController.text);
 
-                        if (match != null) {
+                        if (match != null && isLoading == true) {
+                          showDialog(
+                            context: context,
+                            barrierDismissible:
+                                false, // 사용자가 다른 곳을 탭하더라도 팝업이 종료되지 않도록 합니다.
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('알림'),
+                                content: Text('동영상을 다운로드 받고, 키포인트를 추출 중이에요!'),
+                                actions: <Widget>[
+                                  CircularProgressIndicator(), // 로딩 표시
+                                ],
+                              );
+                            },
+                          );
+
                           inputText = match.group(1) ?? '';
                           print('inputText = ${inputText}');
                           // String downloadUrl =
                           //     "http://64.176.226.248:8001/download/$inputText"; // 임시 Url
-                          filepath = await downloadVideo(inputText);
+                          filepath = await downloadVideo(myController.text);
+
+                          if (filepath.isNotEmpty) {
+                            Map<String, dynamic> fetchData =
+                                await fetchDetails(myController.text);
+                            title = fetchData['title'];
+                            artist = fetchData['artist'];
+                            youtube_url = fetchData['youtube_url'];
+                            // tmp_list[2].toString(); // youtube_url
+                            allFramesKeypoints =
+                                decodeKeypoints(fetchData['keypoints']);
+                          }
+
                           print('filepath = $filepath');
+                          print('title = $title');
+                          print('artist = $artist');
+                          print('allFramesKeypoints = $allFramesKeypoints');
                         }
 
                         setState(() {
                           isLoading = false; // 로딩 종료
                         });
+
+                        // 팝업 종료
+                        Navigator.of(context, rootNavigator: true).pop();
                       },
                       icon: isLoading
                           ? CircularProgressIndicator()
@@ -261,8 +353,13 @@ class _Select_SongState extends State<Select_Song> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      A_Dance_Film(videoPath: filepath)));
+                                  builder: (context) => A_Dance_Film(
+                                        videoPath: filepath,
+                                        allFramesKeypoints: allFramesKeypoints,
+                                        youtube_url: youtube_url,
+                                        title: title,
+                                        artist: artist,
+                                      )));
                         },
                   child: Text(
                     '촬영하러 가기',

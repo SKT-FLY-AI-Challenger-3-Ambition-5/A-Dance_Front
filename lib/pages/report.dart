@@ -1,15 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+import 'dart:convert';
+import 'dart:math';
 
-class MyApp extends StatelessWidget {
-  // class 이름 변경 요망
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: ThreeSectionLayout(),
-    );
-  }
-}
+import 'package:a_dance/main.dart';
+import 'package:a_dance/pages/a_dance_report.dart';
+import 'package:a_dance/pages/songleaderboard.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 class LeaderboardItem {
   final String ranking;
@@ -23,13 +20,117 @@ class LeaderboardItem {
       this.playername, this.bestscore, this.playerbestscore);
 }
 
-List<LeaderboardItem> leaderboardData = [
-  LeaderboardItem('순위', '1위', 'assets/rabbit.png', '쁘띠공주민준', '최고점수', '980점'),
-  LeaderboardItem('순위', '2위', 'assets/boy.png', '히다히다', '최고점수', '979점'),
-  LeaderboardItem('순위', '3위', 'assets/girl.png', '째기', '최고점수', '390점'),
-];
+class ChartData {
+  final String rank;
+  final int count;
 
-class ThreeSectionLayout extends StatelessWidget {
+  ChartData(this.rank, this.count);
+}
+
+class Report extends StatefulWidget {
+  final String title;
+  final double score;
+  final List<double> frame_score;
+  final List<List<Offset>> allFramesKeypoints;
+  final String videoPath;
+  final String username;
+
+  Report(
+      {required this.title,
+      required this.score,
+      required this.frame_score,
+      required this.allFramesKeypoints,
+      required this.videoPath,
+      required this.username});
+
+  @override
+  _ReportState createState() => _ReportState();
+}
+
+class _ReportState extends State<Report> {
+  late final int score;
+  late final List<String> frame_rank;
+  late final int badCount;
+  late final int goodCount;
+  late final int greatCount;
+
+  Future<List<LeaderboardItem>> getLeaderboard() async {
+    List<LeaderboardItem> fetchedItems = [];
+    print('title = ${widget.title}');
+    final Uri url = Uri.parse('$URL/api/get_leaderboard');
+    final Map<String, dynamic> requestBody = {"title": widget.title, "num": 5};
+    final List<String> imagePaths = [
+      'assets/rabbit.png',
+      'assets/boy.png',
+      'assets/girl.png'
+    ]; // 이미지 경로 리스트
+
+    try {
+      final response = await http.post(url,
+          headers: {"Content-Type": "application/json"},
+          body: json.encode(requestBody));
+      print('response = ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        print('responseData = $responseData');
+        List<dynamic> leaderboardResponse = responseData['leaderboard'];
+        print('leaderboardResponse = $leaderboardResponse');
+
+        fetchedItems = leaderboardResponse.asMap().entries.map((e) {
+          int idx = e.key;
+          var item = e.value;
+
+          String randomImagePath =
+              imagePaths[Random().nextInt(imagePaths.length)];
+
+          return LeaderboardItem('순위', '${idx + 1}위', randomImagePath,
+              item['username'], '최고점수', '${item['score']}점');
+        }).toList();
+      } else {
+        print('Failed to send title: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error sending title: $error');
+    }
+    print('fetchedItems = ${fetchedItems}');
+    return fetchedItems;
+  }
+
+  Color getColor(String rank) {
+    switch (rank) {
+      case 'Bad':
+        return Colors.pink;
+      case 'Good':
+        return Colors.yellow;
+      case 'Great':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    score = widget.score.round().toInt();
+    frame_rank = widget.frame_score.map((score) {
+      if (score >= 0 && score < 50) {
+        return 'Bad';
+      } else if (score >= 50 && score < 70) {
+        return 'Good';
+      } else if (score >= 70 && score <= 100) {
+        return 'Great';
+      } else {
+        return 'Unknown'; // 이 경우는 score 값이 주어진 범위 외의 값인 경우를 위한 것입니다.
+      }
+    }).toList();
+
+    badCount = frame_rank.where((rank) => rank == 'Bad').length;
+    goodCount = frame_rank.where((rank) => rank == 'Good').length;
+    greatCount = frame_rank.where((rank) => rank == 'Great').length;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,192 +165,245 @@ class ThreeSectionLayout extends StatelessWidget {
           ],
         ),
       ),
-      body: Container(
-        color: Colors.grey[200],
-        child: Column(
-          children: [
-            Expanded(
-              flex: 4,
-              child: Container(
-                margin: EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Center(
-                  child: Column(
-                    children: [
-                      SizedBox(
-                          height: 310,
-                          width: 310,
-                          child: SfCircularChart(
-                            series: <CircularSeries>[
-                              PieSeries<LeaderboardItem, String>(
-                                dataSource: leaderboardData,
-                                xValueMapper: (LeaderboardItem data, _) =>
-                                    data.playername,
-                                yValueMapper: (LeaderboardItem data, _) =>
-                                    double.parse(data.playerbestscore
-                                        .replaceAll('점', '')),
-                                dataLabelSettings: DataLabelSettings(
-                                  isVisible: true,
-                                ),
-                              ),
-                            ],
-                            title: ChartTitle(
-                              text: '전체 정확도 79%',
-                              textStyle: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          )),
-                      Row(
-                        children: [
-                          SizedBox(width: 20),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              '전체 사용자 중 0위에요',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          ElevatedButton(
-                            onPressed: () {
-                              //버튼 눌렀을 때 수행할 작업
-                            },
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  color: Colors.black,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                              minimumSize: Size(30, 40),
-                            ),
-                            child: Text('이 곡의 리더보드 >',
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold)),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 3,
-              child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 8.0),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: ListView.builder(
-                  itemCount: leaderboardData.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      padding: EdgeInsets.all(10.0),
+      body: FutureBuilder<List<LeaderboardItem>>(
+          future: getLeaderboard(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.error != null) {
+              return Center(child: Text('An error occurred!'));
+            } else
+              print('snapshot = ${snapshot.data}');
+            print('snapshot length = ${snapshot.data?.length}');
+            return Container(
+              color: Colors.grey[200],
+              child: Column(
+                children: [
+                  Expanded(
+                    flex: 4,
+                    child: Container(
+                      margin: EdgeInsets.all(8.0),
                       decoration: BoxDecoration(
-                        border: Border(
-                            bottom: BorderSide(color: Colors.grey.shade300)),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20.0),
                       ),
-                      child: Row(
-                        children: [
-                          SizedBox(width: 30),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                leaderboardData[index].ranking,
-                                style: TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                leaderboardData[index].playerranking,
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          SizedBox(width: 30),
-                          CircleAvatar(
-                            radius: 25,
-                            backgroundImage:
-                                AssetImage(leaderboardData[index].imagePath),
-                          ),
-                          SizedBox(width: 10),
-                          Flexible(
-                            fit: FlexFit.tight,
-                            child: Text(
-                              leaderboardData[index].playername,
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                SizedBox(
+                                  height: 290,
+                                  width: 310,
+                                  child: SfCircularChart(
+                                    series: <CircularSeries>[
+                                      DoughnutSeries<ChartData, String>(
+                                        dataSource: [
+                                          ChartData('Bad', badCount),
+                                          ChartData('Good', goodCount),
+                                          ChartData('Great', greatCount),
+                                        ],
+                                        xValueMapper: (ChartData data, _) =>
+                                            data.rank,
+                                        yValueMapper: (ChartData data, _) =>
+                                            data.count,
+                                        pointColorMapper: (ChartData data, _) =>
+                                            getColor(data.rank),
+                                        dataLabelSettings: DataLabelSettings(
+                                          isVisible: true,
+                                        ),
+                                        dataLabelMapper: (ChartData data, _) =>
+                                            '${data.rank} ${data.count}',
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Column(
+                                  children: [
+                                    Text('총 점수'),
+                                    Text(
+                                      '${score}점',
+                                      style: TextStyle(fontSize: 30),
+                                    ),
+                                  ],
+                                )
+                              ],
                             ),
-                          ),
-                          SizedBox(width: 30),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                leaderboardData[index].bestscore,
-                                style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                leaderboardData[index].playerbestscore,
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          SizedBox(width: 30),
-                        ],
+                            Row(
+                              children: [
+                                SizedBox(width: 20),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    '와우! 대단한 실력인데요~',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                LeaderboardScreen(
+                                                  title: widget.title,
+                                                )));
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      side: BorderSide(
+                                        color: Colors.black,
+                                        width: 1.0,
+                                      ),
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    minimumSize: Size(30, 40),
+                                  ),
+                                  child: Text('이 곡의 리더보드 >',
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold)),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Container(
-                margin: EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Center(
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      primary: Color(0xFF3F3FFF),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      minimumSize: Size(330, 60),
                     ),
-                    child: Text("리포트 보러가기",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 23,
-                            fontWeight: FontWeight.bold)),
                   ),
-                ),
+                  Expanded(
+                    flex: 3,
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 8.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      child: ListView.builder(
+                        itemCount: snapshot.data?.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            padding: EdgeInsets.all(10.0),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                  bottom:
+                                      BorderSide(color: Colors.grey.shade300)),
+                            ),
+                            child: Row(
+                              children: [
+                                SizedBox(width: 30),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      snapshot.data![index].ranking,
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      snapshot.data![index].playerranking,
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(width: 30),
+                                CircleAvatar(
+                                  radius: 25,
+                                  backgroundImage: AssetImage(
+                                      snapshot.data![index].imagePath),
+                                ),
+                                SizedBox(width: 10),
+                                Flexible(
+                                  fit: FlexFit.tight,
+                                  child: Text(
+                                    snapshot.data![index].playername,
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                SizedBox(width: 30),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      snapshot.data![index].bestscore,
+                                      style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      snapshot.data![index].playerbestscore,
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(width: 30),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      margin: EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      child: Center(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => PersonalReport(
+                                          data: widget.frame_score,
+                                          title: widget.title,
+                                          score: score,
+                                          videoPath: widget.videoPath,
+                                          allFramesKeypoints:
+                                              widget.allFramesKeypoints,
+                                          frame_rank: frame_rank,
+                                          username: widget.username,
+                                        )));
+                          },
+                          style: ElevatedButton.styleFrom(
+                            primary: Color(0xFF3F3FFF),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
+                            minimumSize: Size(330, 60),
+                          ),
+                          child: Text("리포트 보러가기",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 23,
+                                  fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
-      ),
+            );
+          }),
     );
   }
 }
